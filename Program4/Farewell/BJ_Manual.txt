@@ -1,0 +1,32 @@
+How to Play:
+1. The object of the game is to beat the dealer's hand without going over 21.
+2. Two cards are dealt to both the player and the Dealer.
+3. The value of the cards are as follows:
+      Ace:   1 or 11, player's choice
+        2:   2
+        3:   3
+        4:   4
+        5:   5
+        6:   6
+        7:   7
+        8:   8
+        9:   9
+       10:  10
+     Jack:  10
+    Queen:  10
+     King:  10
+4. The dealer will only hit on 15 and under and stay on 16 or higher.
+5. The player will have the option to HIT for another card or STAY with their current hand.
+6. If the player's or dealer's hand value is over 21 they lose.
+7. If the player or the dealer has Black Jack (Ace + 10 value card) they automatically win.
+8. If both the player and dealer have Black Jack they tie.
+9. If the player or dealer has 5 cards and they have not bust, they automatically win.
+10.If Admin is entered as the username the user enters debug mode and can test different types of hands.
+11.When a player logs in (LOG IN) they get a bank roll of $100.
+12.To play a game the player bets $10. 
+13.The player gains $20 if they win, $30 if they get Black Jack, and $10 if they tie.
+14.The player is bankrupt if their bank roll reaches $0 and are forced to leave the table.
+15.The player may check game stats at any time by pushing the RESULTS button.
+16.The player may check credits at any time by pushing the CREDITS button.
+17.The player may check this help message at any time by pushing the HELP button.
+18.The player may end their stay at Laithe's Black Jack Table by pushing QUIT.

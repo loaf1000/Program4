@@ -1,0 +1,18 @@
+1. Picture box animation on first screen
+2. Burpback full name once then use first name only
+3. Player must enter a name to continue
+4. Handle Screw ups
+5. Let player get as many extra cards as they want
+6. Let ace assume value of 11 or 1
+7. Do rest of task 7
+8. 5 card charlie
+9. After a card is dealt, it cannot be dealt again (until deck is reshuffled) (2 stars)
+10.User clicks quit before a game is over
+11.Total # of cards and total # of cards of value 10
+12.Total # of 10s, Jacks, Queens, Kings 
+13.Total # of cards of every Value
+14.Total # of hands <16, > 15 & < 21, 21, and >21
+15.Cheat mode for debugging purposes (2 stars)
+16.Limited Bankroll (2 stars)
+
+Total Stars: 19
