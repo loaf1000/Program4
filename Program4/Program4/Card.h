@@ -70,15 +70,30 @@ public:
 		_cardImageList = cardImageList;
 	}
 
-	//declare overloaded operator
-	int operator+(Card^ secondCard);
-	//functions
-	void displayCard(PictureBox^ cardImage, Label^ cardLabel, ImageList^ imageListCards,Point^ location)
+	//Declare and define overloaded operator
+	int operator+(Card^ secondCard)
+	{
+		return _cardValue + secondCard->_cardValue;
+	}
+
+	//Card^ operator=(Card^ lhCard)
+	//{
+	//	// sets values of the card on the right to the card on the left
+	//	_cardName = lhCard->getCardName;
+	//	_cardSuit = lhCard->getCardSuit;
+	//	_cardValue = lhCard->getCardValue;
+	//	_cardImageList = lhCard->getCardImageList;
+	//	// returns the card on the left
+	//	return this;
+	//}
+	//Functions
+	void displayCard(PictureBox^ cardImage, Label^ cardLabel, ImageList^ imageListCards,Point location)
 	{
 		// Picture Box
 
 		cardImage->BackColor = System::Drawing::Color::Transparent;
 		cardImage->Size = System::Drawing::Size(125, 183);
+		cardImage->Location = location;
 		cardImage->TabIndex = 4;
 		cardImage->TabStop = false;
 		cardImage->Visible = true;
@@ -91,13 +106,13 @@ public:
 		// Label
 
 		cardLabel->AutoSize = false;
-		cardLabel->Font = (gcnew System::Drawing::Font(L"Times New Roman", 14, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
+		cardLabel->Font = (gcnew System::Drawing::Font(L"Times New Roman", 10, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
 			static_cast<System::Byte>(0)));
 		cardLabel->ForeColor = System::Drawing::Color::White;
-		cardLabel->Location = System::Drawing::Point(location->X, location->Y + 183);
+		cardLabel->Location = System::Drawing::Point(location.X, location.Y + 183);
 		cardLabel->Size = System::Drawing::Size(125, 33);
 		cardLabel->TabIndex = 3;
-		cardLabel->Text = _cardName + " of " + _cardSuit + " (" + _cardValue.ToString() + ")";
+		cardLabel->Text = _cardName + " of " + _cardSuit + "\n(" + _cardValue.ToString() + ")";
 		cardLabel->TextAlign = ContentAlignment::MiddleCenter;
 		cardLabel->Visible = true;
 		cardLabel->BringToFront();
@@ -114,10 +129,6 @@ protected:
 
 };
 
-// define overloaded operator
-int Card::operator+(Card^ secondCard)
-{
-	return _cardValue + secondCard->_cardValue;
-}
+
 
 #endif // CARD_H

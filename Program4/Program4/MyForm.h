@@ -129,6 +129,9 @@ http://thepiratebay.se/torrent/8206483/Fullmetal_Alchemist__Brotherhood_Soundtra
 
 namespace Program2{
 
+#include "Card.h"
+#include "Hand.h"
+
 	using namespace System;
 	using namespace System::ComponentModel;
 	using namespace System::Collections;
@@ -205,12 +208,6 @@ namespace Program2{
 	private: System::Windows::Forms::TextBox^  textBoxPassword;
 	private: System::Windows::Forms::ComboBox^  comboBoxTestFunctions;
 	private: System::Windows::Forms::Button^  buttonTest;
-
-
-
-
-
-
 
 	protected:
 	private: System::ComponentModel::IContainer^  components;
@@ -722,24 +719,29 @@ namespace Program2{
 		String^ username;
 		String^ firstName;
 
+		// creates arrays to store cards, card images, and card labels for the tester
+		array<PictureBox^>^ testerCardPictureBoxes = gcnew array<PictureBox^>(52);
+		array<Label^>^ testerCardLabels = gcnew array<Label^>(52);
+		array<Point>^ testerCardPositions = gcnew array<Point>(52);
+		Hand^ testerHand = gcnew Hand();
+
 		// creates arrays to store cards, card images, and card labels for the player
 		array<PictureBox^>^ playerCardPictureBoxes = gcnew array<PictureBox^>(10); 
 		array<Label^>^ playerCardLabels = gcnew array<Label^>(60);
-		array<Cards>^ cardsDealtToPlayer = gcnew array<Cards>(10);
 		array<Point>^ playerCardPositions; // card positions for 5 cards (50, 112), (180, 112), (310, 112), (108, 333), (238, 333)
-		array<CardsType>^ playerHand = gcnew array<CardsType>(60);
+		Hand^ playerHand = gcnew Hand();
 
 		// creates arrays to store cards, card images, and card labels for the dealer
 		array<PictureBox^>^ dealerCardPictureBoxes = gcnew array<PictureBox^>(10);
 		array<Label^>^ dealerCardLabels = gcnew array<Label^>(10);
-		array<Cards>^ cardsDealtToDealer = gcnew array<Cards>(10);
 		array<Point>^ dealerCardPositions; // card positions for 5 cards (573 ,112), (703 , 112), (833, 112), (631, 333), (761, 333)
-		array<CardsType>^ dealerHand = gcnew array<CardsType>(60);
+		Hand^ dealerHand = gcnew Hand();
 
 		ArrayList^ deck = gcnew ArrayList();
 
-		//counters for stats
 		int playerCardTotal = 0, dealerCardTotal = 0, playerCardsInHand = 0, dealerCardsInHand = 0, gameNumber = 0, win = 0, loss = 0, tie = 0;
+
+		//counters for stats
 		int totalCardsUsed = 0, totalAcesUsed = 0, totalTwosUsed = 0, totalThreesUsed = 0, totalFoursUsed = 0, totalFivesUsed = 0;
 		int totalSixesUsed = 0, totalSevensUsed = 0, totalEightsUsed = 0, totalNinesUsed = 0, totalTensUsed = 0, totalJacksUsed = 0;
 		int totalQueensUsed = 0, totalKingsUsed = 0, timesShuffled = 0;
@@ -974,7 +976,7 @@ namespace Program2{
 				dealerCardPictureBoxes[i]->Visible = false;
 			}
 
-			countCardsUsed(playerIndex, dealerIndex);
+			//countCardsUsed(playerIndex, dealerIndex);
 
 			if (bankrupt)
 			{
@@ -1069,7 +1071,7 @@ namespace Program2{
 
 			**************************************************************/
 
-		void countCardsUsed(int playerIndex, int dealerIndex)
+		/*void countCardsUsed(int playerIndex, int dealerIndex)
 		{
 			for (int i = 0; i < playerIndex; i++)
 			{
@@ -1272,7 +1274,7 @@ namespace Program2{
 				}
 
 				totalCardsUsed += dealerIndex + playerIndex;
-			}
+			}*/
 
 			/**************************************************************
 
@@ -1353,7 +1355,7 @@ namespace Program2{
 
 			**************************************************************/
 
-		CardsType dealCard(ArrayList^ deck)
+		void dealCard(ArrayList^ deck, Hand^ hand, String^ handOwner)
 		{
 
 			////////////////////////////////////////////////////////////////////
@@ -1362,15 +1364,43 @@ namespace Program2{
 			//
 			////////////////////////////////////////////////////////////////////
 
-			array<CardsType>^ deckCopy = gcnew array<CardsType>(deck->Count);
+			Card^ tempCard = safe_cast<Card^>(deck[0]);
+			int index;
 
 			////////////////////////////////////////////////////////////////////
 
-			deck->CopyTo(deckCopy);
-			deck->Add(deckCopy[0]);
-			deck->RemoveAt(0);
+			if (handOwner = "player")
+			{
 
-			return deckCopy[0];
+			}
+
+			if (handOwner = "dealer")
+			{
+
+			}
+
+			if (handOwner = "tester")
+			{
+				index = hand->getHandSize();
+				this->testerCardPictureBoxes[index] = gcnew PictureBox();
+				this->testerCardLabels[index] = gcnew Label();
+				
+				this->Controls->Add(testerCardPictureBoxes[index]);
+				this->Controls->Add(testerCardLabels[index]);
+				this->testerCardPictureBoxes[index]->Name = index.ToString();
+
+				this->testerCardPictureBoxes[index]->MouseEnter += gcnew System::EventHandler(this, &MyForm::testerCard_MouseEnter);
+				this->testerCardPictureBoxes[index]->MouseLeave += gcnew System::EventHandler(this, &MyForm::testerCard_MouseLeave);
+
+				deck->RemoveAt(0);
+
+				hand += tempCard;
+
+				tempCard->displayCard(testerCardPictureBoxes[index], testerCardLabels[index], imageListCards, testerCardPositions[index]);
+			}
+
+
+
 		}
 
 		/**************************************************************
@@ -1556,9 +1586,11 @@ namespace Program2{
 
 			**************************************************************/
 
-		void displayCardandValue(CardsType card, int index, Point startingPosition,bool player)
+		void displayCardandValue(Card^ card, int index, Point startingPosition)
 		{
-			if (player)
+
+			
+			/*if (player)
 			{
 				playerCardPictureBoxes[index] = gcnew PictureBox();
 
@@ -1568,7 +1600,7 @@ namespace Program2{
 				this->playerCardPictureBoxes[index]->TabIndex = 4;
 				this->playerCardPictureBoxes[index]->TabStop = false;
 				this->playerCardPictureBoxes[index]->Visible = true;
-				this->playerCardPictureBoxes[index]->Image = imageListCards->Images[card.cardImageList];
+				this->playerCardPictureBoxes[index]->Image = imageListCards->Images[card->getCardImageList()];
 				this->playerCardPictureBoxes[index]->Name = index.ToString();
 
 				this->playerCardPictureBoxes[index]->MouseEnter += gcnew System::EventHandler(this, &MyForm::playerCard_MouseEnter);
@@ -1587,7 +1619,7 @@ namespace Program2{
 				this->playerCardLabels[index]->Location = System::Drawing::Point(startingPosition.X, startingPosition.Y + 183);
 				this->playerCardLabels[index]->Size = System::Drawing::Size(125, 33);
 				this->playerCardLabels[index]->TabIndex = 3;
-				this->playerCardLabels[index]->Text = card.cardName + " of " + card.cardSuit + "\n(" + card.cardValue.ToString() + ")";
+				this->playerCardLabels[index]->Text = card->getCardName() + " of " + card->getCardSuit + "\n(" + card->getCardValue.ToString() + ")";
 				this->playerCardLabels[index]->TextAlign = ContentAlignment::MiddleCenter;
 				this->playerCardLabels[index]->Visible = true;
 				this->Controls->Add(this->playerCardLabels[index]);
@@ -1604,7 +1636,7 @@ namespace Program2{
 				this->dealerCardPictureBoxes[index]->TabIndex = 4;
 				this->dealerCardPictureBoxes[index]->TabStop = false;
 				this->dealerCardPictureBoxes[index]->Visible = true;
-				this->dealerCardPictureBoxes[index]->Image = imageListCards->Images[card.cardImageList];
+				this->dealerCardPictureBoxes[index]->Image = imageListCards->Images[card->getCardImageList];
 				this->dealerCardPictureBoxes[index]->Name = index.ToString();
 
 				this->dealerCardPictureBoxes[index]->MouseEnter += gcnew System::EventHandler(this, &MyForm::dealerCard_MouseEnter);
@@ -1622,12 +1654,12 @@ namespace Program2{
 				this->dealerCardLabels[index]->Location = System::Drawing::Point(startingPosition.X, startingPosition.Y + 183);
 				this->dealerCardLabels[index]->Size = System::Drawing::Size(125, 33);
 				this->dealerCardLabels[index]->TabIndex = 3;
-				this->dealerCardLabels[index]->Text = card.cardName + " of " + card.cardSuit + " (" + card.cardValue.ToString() + ")";;
+				this->dealerCardLabels[index]->Text = card->getCardName + " of " + card->getCardSuit + "\n(" + card->getCardValue.ToString() + ")";
 				this->dealerCardLabels[index]->TextAlign = ContentAlignment::MiddleCenter;
 				this->dealerCardLabels[index]->Visible = true;
 				this->Controls->Add(this->dealerCardLabels[index]);
 				this->dealerCardLabels[index]->BringToFront();
-			}
+			}*/
 
 		}
 
@@ -1703,8 +1735,11 @@ namespace Program2{
 
 			for (int i = 0; i < deck->Count; i++)
 			{
-				
-				message +=i.ToString() + ": " + safe_cast<CardsType>(deck[i]).cardName + " of " + safe_cast<CardsType>(deck[i]).cardSuit + ", ";
+				String^ cardName = safe_cast<Card^>(deck[i])->getCardName();
+				String^ cardSuit = safe_cast<Card^>(deck[i])->getCardSuit();
+
+				message +=i.ToString() + ": " + cardName + " of " + cardSuit + ", ";
+
 				if (count == 13)
 				{
 					message += "\n\n";
@@ -2067,6 +2102,53 @@ namespace Program2{
 
 		void initializeArrays()
 		{
+
+			Point testerStartingPoint (30, 82);
+
+			for (int i = 0; i < 52; i++)
+			{
+
+				if (i < 13)
+				{
+					testerCardPositions[i] = testerStartingPoint;
+					testerStartingPoint.X += 20;
+
+					if (i == 12)
+					{
+						testerStartingPoint.X = 30;
+						testerStartingPoint.Y = 162;
+					}
+				}
+
+				else if (i < 26)
+				{
+					testerCardPositions[i] = testerStartingPoint;
+					testerStartingPoint.X += 20;
+					if (i == 25)
+					{
+						testerStartingPoint.X = 30;
+						testerStartingPoint.Y = 252;
+					}
+				}
+
+				else if (i < 39)
+				{
+					testerCardPositions[i] = testerStartingPoint;
+					testerStartingPoint.X += 20;
+					if (i == 38)
+					{
+						testerStartingPoint.X = 30;
+						testerStartingPoint.Y = 342;
+					}
+				}
+
+				else if (i < 52)
+				{
+					testerCardPositions[i] = testerStartingPoint;
+					testerStartingPoint.X += 20;
+				}
+			}
+
 			dealerCardPositions = gcnew array<Point> { Point(573, 112), Point(593, 122), Point(613, 132), Point(633, 142), Point(653, 152) };
 			playerCardPositions = gcnew array<Point> { Point(50, 112), Point(70, 122), Point(90, 132), Point(110, 142), Point(130, 152) };
 
@@ -2125,7 +2207,7 @@ namespace Program2{
 			//
 			////////////////////////////////////////////////////////////////////
 
-			CardsType card;
+			Card^ card = gcnew Card();
 
 			////////////////////////////////////////////////////////////////////
 
@@ -2133,10 +2215,12 @@ namespace Program2{
 
 			for (int i = 0; i < 52; i++)
 			{
-				card.cardValue = cardValue[i % 13];
-				card.cardName = cardName[i % 13];
-				card.cardSuit = cardSuit[i / 13];
-				card.cardImageList = i;
+				card = gcnew Card();
+
+				card->setCardValue(cardValue[i % 13]);
+				card->setCardName(cardName[i % 13]);
+				card->setCardSuit(cardSuit[i / 13]);
+				card->setCardImageList(i);
 				deck->Add(card);
 			}
 		}
@@ -2149,7 +2233,7 @@ namespace Program2{
 			//
 			////////////////////////////////////////////////////////////////////
 
-			array<CardsType>^ tempDeck = gcnew array<CardsType>(52);
+			array<Card^>^ tempDeck = gcnew array<Card^>(52);
 
 			////////////////////////////////////////////////////////////////////
 
@@ -2194,13 +2278,17 @@ namespace Program2{
 			//
 			////////////////////////////////////////////////////////////////////
 
-			Cards nextCard = Cards::cA;
-			ArrayList^ sortedDeck = gcnew ArrayList(deck);
+			ArrayList^ sortedDeck =gcnew ArrayList(deck);
 			Random^ seedGenerator = gcnew Random();
 			int index, seed = seedGenerator->Next();
 			Random^ shuffler = gcnew Random(seed);
 
 			////////////////////////////////////////////////////////////////////
+
+			/*for (int i = 0; i < deck->Count; i++)
+			{
+				sortedDeck->Add(deck[i]);
+			}*/
 
 			deck->Clear();
 
@@ -2372,20 +2460,20 @@ namespace Program2{
 				shuffleDeck(deck);
 			}
 
-			playerHand[playerCardsInHand] = dealCard(deck);
+			//playerHand[playerCardsInHand] = dealCard(deck);
 
 
-			if (cardAce(cardsDealtToPlayer[playerCardsInHand]))
+			/*if (cardAce(cardsDealtToPlayer[playerCardsInHand]))
 			{
 				playerCardValue = changeValueAce(playerCardsInHand);
-			}
+			}*/
 
 			else
 			{
-				playerCardValue = getCardValue(cardsDealtToPlayer[playerCardsInHand]);
+				//playerCardValue = getCardValue(cardsDealtToPlayer[playerCardsInHand]);
 			}
 
-			displayCardandValue(playerHand[playerCardsInHand], playerCardsInHand, playerCardPositions[playerCardsInHand], true);
+			//displayCardandValue(playerHand[playerCardsInHand], playerCardsInHand, playerCardPositions[playerCardsInHand]);
 			playerCardsInHand++;
 
 			playerCardTotal += playerCardValue;
@@ -2586,16 +2674,16 @@ namespace Program2{
 
 				for (int i = 0; i < 2; i ++)
 				{
-					playerHand[i] = dealCard(deck);
-					dealerHand[i] = dealCard(deck);
+					//playerHand[i] = dealCard(deck);
+					//dealerHand[i] = dealCard(deck);
 
-					playerCardValue = getCardValue(cardsDealtToPlayer[i]);
-					dealerCardValue = getCardValue(cardsDealtToDealer[i]);
+					//playerCardValue = getCardValue(cardsDealtToPlayer[i]);
+					//dealerCardValue = getCardValue(cardsDealtToDealer[i]);
 
-					displayCardandValue(playerHand[i], i, playerCardPositions[i], true);
-					displayCardandValue(dealerHand[i], i, dealerCardPositions[i], false);
+					//displayCardandValue(playerHand[i], i, playerCardPositions[i]);
+					//displayCardandValue(dealerHand[i], i, dealerCardPositions[i]);
 
-					if (cardAce(cardsDealtToDealer[i]))
+					/*if (cardAce(cardsDealtToDealer[i]))
 					{
 						dealerCardValue = dealerAceChange(dealerCardTotal);
 
@@ -2604,7 +2692,7 @@ namespace Program2{
 							dealerCardLabels[i]->Text = "Card Value: 1";
 						}
 						
-					}
+					}*/
 
 					playerCardsInHand++;
 					dealerCardsInHand++;
@@ -2645,7 +2733,7 @@ namespace Program2{
 				
 				for (int i = 0; i < playerCardsInHand; i++)
 				{
-					if (cardAce(cardsDealtToPlayer[i]))
+					/*if (cardAce(cardsDealtToPlayer[i]))
 						{
 							if (changeValueAce(i) == 1)
 							{
@@ -2655,7 +2743,7 @@ namespace Program2{
 								playerCardLabels[i]->Text = "Card Value: 1";
 								//displayCardandValue(cardsDealtToPlayer[i], i, 1, playerCardPositions[i], true);
 							}
-						}
+						}*/
 				}
 				
 
@@ -2711,13 +2799,13 @@ namespace Program2{
 				displayDealerStrategy();
 				labelDescription->Location = Point(504 - (labelDescription->Width / 2), 49);
 
-				dealerHand[dealerCardsInHand] = dealCard(deck);
+				//dealerHand[dealerCardsInHand] = dealCard(deck);
 
-				dealerCardValue = getCardValue(cardsDealtToDealer[dealerCardsInHand]);
+				//dealerCardValue = getCardValue(cardsDealtToDealer[dealerCardsInHand]);
 
-				displayCardandValue(dealerHand[dealerCardsInHand], dealerCardsInHand, dealerCardPositions[dealerCardsInHand], false);
+				//displayCardandValue(dealerHand[dealerCardsInHand], dealerCardsInHand, dealerCardPositions[dealerCardsInHand]);
 
-				if (cardAce(cardsDealtToDealer[dealerCardsInHand]))
+				/*if (cardAce(cardsDealtToDealer[dealerCardsInHand]))
 				{
 					dealerCardValue = dealerAceChange(dealerCardTotal);
 
@@ -2726,7 +2814,7 @@ namespace Program2{
 						dealerCardLabels[dealerCardsInHand]->Text = "Card Value: 1";
 					}
 
-				}
+				}*/
 
 				dealerCardsInHand++;
 
@@ -2813,31 +2901,79 @@ Return
 			if (comboBoxTestFunctions->Text == "Display deck")
 			{
 				displayDeck(deck);
-				for (int i = 0; i < 5; i++)
+				for (int i = 0; i < 52; i++)
 				{
-					displayCardandValue(safe_cast<CardsType>(deck[i]), i, playerCardPositions[i], true);
+					dealCard(deck, testerHand, "tester");
 				}
 
-				for (int i = 5; i < 10; i++)
-				{
-					displayCardandValue(safe_cast<CardsType>(deck[i]), i-5, dealerCardPositions[i-5], false);
-				}
 			}
 
 			if (comboBoxTestFunctions->Text == "Shuffle deck")
+			{
+				shuffleDeck(deck);
+				
+			}
+
+			if (comboBoxTestFunctions->Text == "Shuffle deck (Random Swap)")
+			{
+				shuffleRandomSwap(deck);
+			}
+
+			if (comboBoxTestFunctions->Text == "Deal a card")
+			{
+				for (int i = 0; i < testerHand->getHandSize(); i++)
+				{
+					delete testerCardPictureBoxes[i];
+					delete testerCardLabels[i];
+				}
+
+				testerHand->clearHand();
+
+				dealCard(deck, testerHand, "tester");
+
+			}
+
+			if (comboBoxTestFunctions->Text == "Deal a hand")
+			{
+				for (int i = 0; i < testerHand->getHandSize(); i++)
+				{
+					delete testerCardPictureBoxes[i];
+					delete testerCardLabels[i];
+				}
+
+				dealCard(deck, testerHand, "tester");
+				dealCard(deck, testerHand, "tester");
+			}
+
+			if (comboBoxTestFunctions->Text == "Add card to hand")
+			{
+				dealCard(deck, testerHand, "tester");
+			}
+
+			if (comboBoxTestFunctions->Text == "Arrange hand")
+			{
+				shuffleDeck(deck);
+			}
+
+			if (comboBoxTestFunctions->Text == "Store deck on disk")
+			{
+				shuffleDeck(deck);
+			}
+
+			if (comboBoxTestFunctions->Text == "Load deck from disk")
 			{
 				shuffleDeck(deck);
 			}
 
 			if (comboBoxTestFunctions->Text == "Return")
 			{
-				for (int i = 0; i < 5; i++)
+				for (int i = 0; i < testerHand->getHandSize(); i++)
 				{
-					delete playerCardPictureBoxes[i];
-					delete playerCardLabels[i];
-					delete dealerCardPictureBoxes[i];
-					delete dealerCardLabels[i];
+					delete testerCardPictureBoxes[i];
+					delete testerCardLabels[i];
 				}
+
+				testerHand->clearHand();
 			}
 		}
 
@@ -2855,13 +2991,32 @@ Return
 
 		private: System::Void playerCard_MouseLeave(System::Object^ sender, System::EventArgs^ e)
 		{
-			for (int i = 0; i < 5; i++)
+			for (int i = 0; i < playerHand->getHandSize(); i++)
 			{
 				playerCardPictureBoxes[i]->BringToFront();
 				playerCardLabels[i]->BringToFront();
 			}
 		}
+private: System::Void testerCard_MouseEnter(System::Object^ sender, System::EventArgs^ e)
+{
+	int index = 0;
 
+	Int32::TryParse(safe_cast<PictureBox^>(sender)->Name, index);
+
+	testerCardPictureBoxes[index]->BringToFront();
+	testerCardLabels[index]->BringToFront();
+
+
+}
+
+		private: System::Void testerCard_MouseLeave(System::Object^ sender, System::EventArgs^ e)
+		{
+			for (int i = 0; i < testerHand->getHandSize(); i++)
+			{
+				testerCardPictureBoxes[i]->BringToFront();
+				testerCardLabels[i]->BringToFront();
+			}
+		}
 		private: System::Void dealerCard_MouseEnter(System::Object^ sender, System::EventArgs^ e)
 				 {
 					 int index = 0;
@@ -2876,7 +3031,7 @@ Return
 
 		private: System::Void dealerCard_MouseLeave(System::Object^ sender, System::EventArgs^ e)
 		{
-			for (int i = 0; i < 5; i++)
+			for (int i = 0; i < dealerHand->getHandSize(); i++)
 			{
 				dealerCardPictureBoxes[i]->BringToFront();
 				dealerCardLabels[i]->BringToFront();
