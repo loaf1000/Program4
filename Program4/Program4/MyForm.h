@@ -2726,7 +2726,7 @@ namespace Program2{
 				
 			}
 
-			else if (dealerHand->getHandValue() == 5)
+			else if (dealerHand->getHandSize() == 5)
 			{
 				displayGameResults("dealer 5 card win");
 				loss++;
@@ -2850,6 +2850,7 @@ Return
 				comboBoxTestFunctions->Visible = false;
 				buttonPlay->Visible = true;
 				deck->Clear();
+				buttonTest->Visible = false;
 			}
 		}
 
