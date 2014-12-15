@@ -80,6 +80,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Card.h" />
+    <ClInclude Include="GameResult.h" />
     <ClInclude Include="Hand.h" />
     <ClInclude Include="MyForm.h">
       <FileType>CppForm</FileType>

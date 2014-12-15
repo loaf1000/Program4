@@ -6,64 +6,80 @@
 ID INFORMATION
 
 Programmers		        :Laithe Marshall
-Assignment #		    :2
-Assignment Name		    :Black Jack
+Assignment #		    :Final Project
+Assignment Name		    :Black Jack - The Big Deal
 Course # and Title		:CISC 192 - C++
 Class Meeting Time		:MW 9:35 - 12:45
 Instructor			    :Professor Forman
-Hours			        :40
-Difficulty			    :5
-Completion Date		    :December/01/2014
-Project Name		    :Program2
+Hours			        :60
+Difficulty			    :6
+Completion Date		    :December/15/2014
+Project Name		    :Program4
 
 ***************************************************************
 ***************************************************************
 CUSTOM DEFINED FUNCTIONS
-
+addCardToHand
+arrangeHand
 blackJack
 bust
-cardAce
-changeValueAce
 cleanup
+clearScreenTester
 credits
-countCardsUsed
-countHandTypes
 dealCard
+dealHand
 dealerAceChange
 dealerHit
 debugDecks
 displayCardandValue
 displayCardTotal
 displayDealerStrategy
+displayDeck
 displayFarewellMessage
 displayGameResults
 displayGameStats
 getCardValue
+getHandTypes
 initializePointArrays
+loadDeck
 quit
+setupDeckBySuit
+setupDeckByValue
+storeDeck
 shuffleDeck
+shuffleRandomSwap
 updateBank
+validAccount
 
 ***************************************************************
 ***************************************************************
 EVENT-DRIVEN FUNCTIONS
 
 buttonCredits_Click
+buttonDisplayDeck_Click
 buttonHelp_Click
+buttonHistory_Click
 buttonHit_Click
 buttonLogin_Click
 buttonQuit_Click
 buttonPlay_Click
 buttonResults_Click
 buttonStay_Click
+buttonTest_Click
+dealerCard_MouseEnter
+dealerCard_MouseLeave
 MyForm_Load
+playerCard_MouseEnter
+playerCard_MouseLeave
+testerCard_MouseEnter
+testerCard_MouseLeave
 timerCardAnimation_Tick
 timerDateTime_Tick
 ***************************************************************
 ***************************************************************
 PROGRAM DESCRIPTION
 The program welcomes the user to the Black Jack "table" and asks
-the user to log in. The user will then be given a bank roll of 
+the user to log in with account # and password. The user will then be given a bank roll of 
 $100 to play black jack. When the user hits play, they bet $10
 to play a hand of Black Jack. The user has the option to hit or stay,
 and plays against the dealer. The user gains $20 if they win, $30 if they
@@ -86,7 +102,7 @@ Remember the “triangle of learning”
 Thanks for assistance and inspiration from:
 
 Thanks to Professor Forman for creating TDHOs.
-
+http://visualgo.net/ for bubble sorting help
 Thanks for the opportunity to assist and inspire:
 
 N/A
@@ -131,6 +147,8 @@ namespace Program2{
 
 #include "Card.h"
 #include "Hand.h"
+#include "GameResult.h"
+
 
 	using namespace System;
 	using namespace System::ComponentModel;
@@ -154,14 +172,13 @@ namespace Program2{
 			//
 		}
 
-		value class CardsType
+		value class AccountType
 		{
 		public:
-			String^ cardName;
-			String^ cardSuit;
-			int cardValue;
-			int cardImageList;
-
+			String^ accountNumber;
+			String^ password;
+			String^ firstName;
+			String^ lastName;
 		};
 
 	protected:
@@ -208,6 +225,10 @@ namespace Program2{
 	private: System::Windows::Forms::TextBox^  textBoxPassword;
 	private: System::Windows::Forms::ComboBox^  comboBoxTestFunctions;
 	private: System::Windows::Forms::Button^  buttonTest;
+	private: System::Windows::Forms::Button^  buttonDisplayDeck;
+	private: System::Windows::Forms::Label^  labelPassword;
+	private: System::Windows::Forms::Label^  labelAccountNumber;
+	private: System::Windows::Forms::Button^  buttonHistory;
 
 	protected:
 	private: System::ComponentModel::IContainer^  components;
@@ -254,6 +275,10 @@ namespace Program2{
 			this->textBoxPassword = (gcnew System::Windows::Forms::TextBox());
 			this->comboBoxTestFunctions = (gcnew System::Windows::Forms::ComboBox());
 			this->buttonTest = (gcnew System::Windows::Forms::Button());
+			this->buttonDisplayDeck = (gcnew System::Windows::Forms::Button());
+			this->labelPassword = (gcnew System::Windows::Forms::Label());
+			this->labelAccountNumber = (gcnew System::Windows::Forms::Label());
+			this->buttonHistory = (gcnew System::Windows::Forms::Button());
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBoxGif))->BeginInit();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBoxAlignment))->BeginInit();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBoxCardAnimation1))->BeginInit();
@@ -404,6 +429,7 @@ namespace Program2{
 			this->textBoxLogin->Name = L"textBoxLogin";
 			this->textBoxLogin->Size = System::Drawing::Size(150, 26);
 			this->textBoxLogin->TabIndex = 6;
+			this->textBoxLogin->Text = L"Account # (1234)";
 			// 
 			// labelDescription
 			// 
@@ -613,8 +639,10 @@ namespace Program2{
 				static_cast<System::Byte>(0)));
 			this->textBoxPassword->Location = System::Drawing::Point(429, 190);
 			this->textBoxPassword->Name = L"textBoxPassword";
+			this->textBoxPassword->PasswordChar = '*';
 			this->textBoxPassword->Size = System::Drawing::Size(150, 26);
 			this->textBoxPassword->TabIndex = 21;
+			this->textBoxPassword->Text = L"Password";
 			// 
 			// comboBoxTestFunctions
 			// 
@@ -623,9 +651,10 @@ namespace Program2{
 				static_cast<System::Byte>(0)));
 			this->comboBoxTestFunctions->ForeColor = System::Drawing::Color::White;
 			this->comboBoxTestFunctions->FormattingEnabled = true;
-			this->comboBoxTestFunctions->Items->AddRange(gcnew cli::array< System::Object^  >(10) {
-				L"Set up deck", L"Display deck", L"Shuffle deck",
-					L"Deal a card", L"Deal a hand", L"Add card to hand", L"Arrange hand ", L"Store deck on disk", L"Load deck from disk", L"Return"
+			this->comboBoxTestFunctions->Items->AddRange(gcnew cli::array< System::Object^  >(12) {
+				L"Set up deck by suit", L"Set up deck by value",
+					L"Display deck", L"Shuffle deck", L"Shuffle deck (Random Swap)", L"Deal a card", L"Deal a hand", L"Add card to hand", L"Arrange hand",
+					L"Store deck on disk", L"Load deck from disk", L"Return"
 			});
 			this->comboBoxTestFunctions->Location = System::Drawing::Point(361, 569);
 			this->comboBoxTestFunctions->Name = L"comboBoxTestFunctions";
@@ -649,6 +678,60 @@ namespace Program2{
 			this->buttonTest->Visible = false;
 			this->buttonTest->Click += gcnew System::EventHandler(this, &MyForm::buttonTest_Click);
 			// 
+			// buttonDisplayDeck
+			// 
+			this->buttonDisplayDeck->BackColor = System::Drawing::Color::Black;
+			this->buttonDisplayDeck->Font = (gcnew System::Drawing::Font(L"Times New Roman", 12, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
+				static_cast<System::Byte>(0)));
+			this->buttonDisplayDeck->ForeColor = System::Drawing::Color::White;
+			this->buttonDisplayDeck->Location = System::Drawing::Point(424, 642);
+			this->buttonDisplayDeck->Name = L"buttonDisplayDeck";
+			this->buttonDisplayDeck->Size = System::Drawing::Size(160, 40);
+			this->buttonDisplayDeck->TabIndex = 24;
+			this->buttonDisplayDeck->Text = L"Display Deck";
+			this->buttonDisplayDeck->UseVisualStyleBackColor = false;
+			this->buttonDisplayDeck->Visible = false;
+			this->buttonDisplayDeck->Click += gcnew System::EventHandler(this, &MyForm::buttonDisplayDeck_Click);
+			// 
+			// labelPassword
+			// 
+			this->labelPassword->AutoSize = true;
+			this->labelPassword->Font = (gcnew System::Drawing::Font(L"Times New Roman", 18, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
+				static_cast<System::Byte>(0)));
+			this->labelPassword->ForeColor = System::Drawing::Color::White;
+			this->labelPassword->Location = System::Drawing::Point(452, 158);
+			this->labelPassword->Name = L"labelPassword";
+			this->labelPassword->Size = System::Drawing::Size(104, 27);
+			this->labelPassword->TabIndex = 25;
+			this->labelPassword->Text = L"Password";
+			// 
+			// labelAccountNumber
+			// 
+			this->labelAccountNumber->AutoSize = true;
+			this->labelAccountNumber->Font = (gcnew System::Drawing::Font(L"Times New Roman", 18, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
+				static_cast<System::Byte>(0)));
+			this->labelAccountNumber->ForeColor = System::Drawing::Color::White;
+			this->labelAccountNumber->Location = System::Drawing::Point(415, 99);
+			this->labelAccountNumber->Name = L"labelAccountNumber";
+			this->labelAccountNumber->Size = System::Drawing::Size(178, 27);
+			this->labelAccountNumber->TabIndex = 26;
+			this->labelAccountNumber->Text = L"Account Number";
+			// 
+			// buttonHistory
+			// 
+			this->buttonHistory->BackColor = System::Drawing::Color::Black;
+			this->buttonHistory->Font = (gcnew System::Drawing::Font(L"Times New Roman", 12, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
+				static_cast<System::Byte>(0)));
+			this->buttonHistory->ForeColor = System::Drawing::Color::White;
+			this->buttonHistory->Location = System::Drawing::Point(730, 678);
+			this->buttonHistory->Name = L"buttonHistory";
+			this->buttonHistory->Size = System::Drawing::Size(78, 40);
+			this->buttonHistory->TabIndex = 27;
+			this->buttonHistory->Text = L"History";
+			this->buttonHistory->UseVisualStyleBackColor = false;
+			this->buttonHistory->Visible = false;
+			this->buttonHistory->Click += gcnew System::EventHandler(this, &MyForm::buttonHistory_Click);
+			// 
 			// MyForm
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
@@ -657,6 +740,8 @@ namespace Program2{
 			this->BackgroundImage = (cli::safe_cast<System::Drawing::Image^>(resources->GetObject(L"$this.BackgroundImage")));
 			this->BackgroundImageLayout = System::Windows::Forms::ImageLayout::Center;
 			this->ClientSize = System::Drawing::Size(1008, 730);
+			this->Controls->Add(this->labelAccountNumber);
+			this->Controls->Add(this->labelPassword);
 			this->Controls->Add(this->textBoxPassword);
 			this->Controls->Add(this->labelGameNumber);
 			this->Controls->Add(this->buttonCredits);
@@ -675,12 +760,14 @@ namespace Program2{
 			this->Controls->Add(this->buttonStay);
 			this->Controls->Add(this->buttonResults);
 			this->Controls->Add(this->labelDealerTotal);
-			this->Controls->Add(this->buttonPlay);
 			this->Controls->Add(this->labelBank);
 			this->Controls->Add(this->labelPlayerTotal);
 			this->Controls->Add(this->comboBoxCheat);
 			this->Controls->Add(this->buttonTest);
 			this->Controls->Add(this->comboBoxTestFunctions);
+			this->Controls->Add(this->buttonPlay);
+			this->Controls->Add(this->buttonDisplayDeck);
+			this->Controls->Add(this->buttonHistory);
 			this->DoubleBuffered = true;
 			this->Icon = (cli::safe_cast<System::Drawing::Icon^>(resources->GetObject(L"$this.Icon")));
 			this->Name = L"MyForm";
@@ -702,22 +789,14 @@ namespace Program2{
 		//				DECLARE GLOBAL VARIABLES/OBJECTS
 		//
 		////////////////////////////////////////////////////////////////////
-		enum class Cards //c for clubs, d for diamonds, h for hearts, s for spades, J for jacks, Q for queens, K for kings
-		{
-			cA, c2, c3, c4, c5, c6, c7, c8, c9, c10, cJ, cQ, cK,
-			dA, d2, d3, d4, d5, d6, d7, d8, d9, d10, dJ, dQ, dK,
-			hA, h2, h3, h4, h5, h6, h7, h8, h9, h10, hJ, hQ, hK,
-			sA, s2, s3, s4, s5, s6, s7, s8, s9, s10, sJ, sQ, sK
-		};
-
-			
 
 		array<String^>^ cardName; 
 		array<String^>^ cardSuit;
 		array<int>^ cardValue;
 
-		String^ username;
-		String^ firstName;
+		AccountType user;
+		GameResults^ userHistory = gcnew GameResults();
+		GameResults^ dealerHistory = gcnew GameResults();
 
 		// creates arrays to store cards, card images, and card labels for the tester
 		array<PictureBox^>^ testerCardPictureBoxes = gcnew array<PictureBox^>(52);
@@ -739,7 +818,8 @@ namespace Program2{
 
 		ArrayList^ deck = gcnew ArrayList();
 
-		int playerCardTotal = 0, dealerCardTotal = 0, playerCardsInHand = 0, dealerCardsInHand = 0, gameNumber = 0, win = 0, loss = 0, tie = 0;
+		int gameNumber = 0, win = 0, loss = 0, tie = 0;
+		int playerWinCounter = 0, playerLoseCounter = 0, playerTieCounter = 0;
 
 		//counters for stats
 		int totalCardsUsed = 0, totalAcesUsed = 0, totalTwosUsed = 0, totalThreesUsed = 0, totalFoursUsed = 0, totalFivesUsed = 0;
@@ -758,6 +838,47 @@ namespace Program2{
 		//
 		////////////////////////////////////////////////////////////////////
 
+		void addCardToHand(ArrayList^ deck ,Hand^ hand, String^ owner)
+		{
+			if (hand->getHandSize() < 2)
+			{
+				MessageBox::Show("Please deal a hand before adding a card to the hand.", "Error");
+			}
+			else
+			{
+				dealCard(deck, hand, owner);
+			}
+		}
+
+		void arrangeHand(Hand^ hand, String^ owner)
+		{
+			if (hand->getHandSize() > 0)
+			{
+				if (owner = "tester")
+				{
+					ArrayList^ tempHand;
+					hand->arrangeHand();
+
+					int handSize = hand->getHandSize();
+
+					tempHand = gcnew ArrayList(hand->getCards());
+
+					clearScreenTester();
+					hand->setHandSize(0);
+
+					for (int i = 0; i < handSize; i++)
+					{
+
+						dealCard(tempHand, hand, owner);
+					}
+				}
+			}
+
+			else
+			{
+				MessageBox::Show("Please create a hand to arrange.", "Error");
+			}
+		}
 
 		/**************************************************************
 
@@ -825,91 +946,6 @@ namespace Program2{
 
 		/**************************************************************
 
-			NAME: cardAce
-
-			DESCRIPTION: Validity statement that returns true if a card is an ace,
-			else it returns false
-
-			PRECONDITIONS: function takes a valid card from the enum class cards
-
-			POSTCONDITIONS: see description
-
-			CALLED BY: buttonHit_Click, buttonPlay_Click, buttonStay_Click
-
-			CALLS: None
-
-			**************************************************************/
-
-
-		bool cardAce(Cards card)
-		{
-			switch (card)
-			{
-			case Cards::cA:
-			case Cards::dA:
-			case Cards::sA:
-			case Cards::hA:
-				return true;
-				break;
-			default:
-				return false;
-			}
-		}
-
-
-		/**************************************************************
-
-			NAME: changeValueAce
-
-			DESCRIPTION: Asks the player if they would like the player to change the value of their ace
-			Yes returns the integer 1 and No returns the integer 11.
-
-			PRECONDITIONS: function requires a valid index integer of the ace to change value in the label
-
-			POSTCONDITIONS: see description
-
-			CALLED BY: buttonHit_Click, buttonPlay_Click
-
-			CALLS: None
-
-		**************************************************************/
-
-
-		int changeValueAce(int index)
-		{
-			////////////////////////////////////////////////////////////////////
-			//
-			//				DECLARE LOCAL VARIABLES/OBJECTS
-			//
-			////////////////////////////////////////////////////////////////////
-
-			Windows::Forms::DialogResult buttonClicked;
-
-			////////////////////////////////////////////////////////////////////
-
-			buttonClicked = MessageBox::Show("Would you like the value of your ace to be 1? " +
-				"\nYes for 1, No for 11.",
-				"Ace 1/11",
-				MessageBoxButtons::YesNo,
-				MessageBoxIcon::Question,
-				MessageBoxDefaultButton::Button2);
-
-			if (buttonClicked == Windows::Forms::DialogResult::Yes)
-			{
-				return  1;
-				playerCardLabels[index]->Text = "Card Value: 1";
-			}
-			
-			else
-			{
-				return 11;
-			}
-				
-		}
-
-
-		/**************************************************************
-
 			NAME: cleanup
 
 			DESCRIPTION: Readys the program to play another game of black jack
@@ -928,9 +964,11 @@ namespace Program2{
 
 		**************************************************************/
 
-		void cleanup(int playerIndex, int dealerIndex)
+		void cleanup()
 		{
-			
+			GameType playerCurrentGame;
+			GameType dealerCurrentGame;
+
 			buttonHit->Visible = false;
 			buttonStay->Visible = false;
 			buttonPlay->Visible = true;
@@ -939,14 +977,44 @@ namespace Program2{
 
 			playingGame = false;
 
-			countHandTypes(playerCardTotal, dealerCardTotal);
+			playerCurrentGame.cardTotal = playerHand->getHandValue();
+			dealerCurrentGame.cardTotal = dealerHand->getHandValue();
+
+			playerCurrentGame.handResult = getHandType(playerHand->getHandValue());
+			dealerCurrentGame.handResult = getHandType(dealerHand->getHandValue());
+
+			playerCurrentGame.gameNumber = gameNumber;
+			dealerCurrentGame.gameNumber = gameNumber;
+			
+			if (playerWinCounter < win)
+			{
+				playerCurrentGame.gameOutcome = GameResult::win;
+				dealerCurrentGame.gameOutcome = GameResult::lose;
+				playerWinCounter++;
+			}
+
+			else if (playerLoseCounter < loss)
+			{
+				playerCurrentGame.gameOutcome = GameResult::lose;
+				dealerCurrentGame.gameOutcome = GameResult::win;
+				playerLoseCounter++;
+			}
+
+			else if (playerTieCounter < tie)
+			{
+				playerCurrentGame.gameOutcome = GameResult::tie;
+				dealerCurrentGame.gameOutcome = GameResult::tie;
+				playerTieCounter++;
+			}
+			else
+			{
+				MessageBox::Show("error");
+			}
 			updateBank();
 
-			playerCardsInHand = 0;
-			dealerCardsInHand = 0;
+			userHistory->addGameResult(playerCurrentGame);
+			dealerHistory->addGameResult(dealerCurrentGame);
 
-			playerCardTotal = 0;
-			dealerCardTotal = 0;
 
 			playerWin = false;
 			tied = false;
@@ -962,28 +1030,37 @@ namespace Program2{
 				comboBoxCheat->Visible = true;
 			}
 
-			for (int i = 0; i < playerIndex; i++)
+			for (int i = 0; i < playerHand->getHandSize(); i++)
 			{
-				playerCardLabels[i]->Visible = false;
-				playerCardPictureBoxes[i]->Visible = false;
-
-				
+				delete playerCardPictureBoxes[i];
+				delete playerCardLabels[i];
 			}
 
-			for (int i = 0; i < dealerIndex; i++)
+			for (int i = 0; i < dealerHand->getHandSize(); i++)
 			{
-				dealerCardLabels[i]->Visible = false;
-				dealerCardPictureBoxes[i]->Visible = false;
+				delete dealerCardPictureBoxes[i];
+				delete dealerCardLabels[i];
 			}
 
-			//countCardsUsed(playerIndex, dealerIndex);
+			playerHand->clearHand();
+
+			dealerHand->clearHand();
 
 			if (bankrupt)
 			{
 				quit();
 			}
 		}
+		void clearScreenTester()
+		{
+			for (int i = 0; i < testerHand->getHandSize(); i++)
+			{
+				delete testerCardPictureBoxes[i];
+				delete testerCardLabels[i];
+			}
 
+			testerHand->clearHand();
+		}
 		/**************************************************************
 
 			NAME: credits
@@ -1000,6 +1077,8 @@ namespace Program2{
 			CALLS: None
 
 			**************************************************************/
+
+
 
 		void credits()
 		{
@@ -1052,235 +1131,13 @@ namespace Program2{
 				);
 		}
 
-		/**************************************************************
 
-			NAME: countCardsUsed
-
-			DESCRIPTION: Counts how many total cards and card values are used in a game of Black Jack.
-
-			PRECONDITIONS: Function requires the integer amount of cards used by player and dealer
-			to clear all cards and their labels using these values and a index ceiling. These values
-			must be exact, to high and the program will crash, to low and it will not count all the cards 
-			in the dealer's and player's hand.
-
-			POSTCONDITIONS: None
-
-			CALLED BY: cleanup
-
-			CALLS: None
-
-			**************************************************************/
-
-		/*void countCardsUsed(int playerIndex, int dealerIndex)
-		{
-			for (int i = 0; i < playerIndex; i++)
-			{
-				switch (cardsDealtToPlayer[i])
-				{
-				case Cards::cA:
-				case Cards::dA:
-				case Cards::sA:
-				case Cards::hA:
-					totalAcesUsed++;
-					break;
-				case Cards::c2:
-				case Cards::d2:
-				case Cards::s2:
-				case Cards::h2:
-
-					totalTwosUsed++;
-					break;
-				case Cards::c3:
-				case Cards::d3:
-				case Cards::s3:
-				case Cards::h3:
-
-					totalThreesUsed++;
-					break;
-				case Cards::c4:
-				case Cards::d4:
-				case Cards::s4:
-				case Cards::h4:
-
-					totalFoursUsed++;
-					break;
-				case Cards::c5:
-				case Cards::d5:
-				case Cards::s5:
-				case Cards::h5:
-
-					totalFivesUsed++;
-					break;
-				case Cards::c6:
-				case Cards::d6:
-				case Cards::s6:
-				case Cards::h6:
-
-					totalSixesUsed++;
-					break;
-				case Cards::c7:
-				case Cards::d7:
-				case Cards::s7:
-				case Cards::h7:
-
-					totalSevensUsed++;
-					break;
-				case Cards::c8:
-				case Cards::d8:
-				case Cards::s8:
-				case Cards::h8:
-
-					totalEightsUsed++;
-					break;
-				case Cards::c9:
-				case Cards::d9:
-				case Cards::s9:
-				case Cards::h9:
-
-					totalNinesUsed++;
-					break;
-				case Cards::c10:
-				case Cards::d10:
-				case Cards::s10:
-				case Cards::h10:
-
-					totalTensUsed++;
-					break;
-				case Cards::cJ:
-				case Cards::dJ:
-				case Cards::sJ:
-				case Cards::hJ:
-
-					totalJacksUsed++;
-					break;
-				case Cards::cQ:
-				case Cards::dQ:
-				case Cards::sQ:
-				case Cards::hQ:
-
-					totalQueensUsed++;
-					break;
-				case Cards::cK:
-				case Cards::dK:
-				case Cards::sK:
-				case Cards::hK:
-
-					totalKingsUsed++;
-					break;
-				default:
-					//this should not occur
-					break;
-				}
-			}
-
-				for (int i = 0; i < dealerIndex; i++)
-				{
-					switch (cardsDealtToDealer[i])
-					{
-					case Cards::cA:
-					case Cards::dA:
-					case Cards::sA:
-					case Cards::hA:
-						totalAcesUsed++;
-						break;
-					case Cards::c2:
-					case Cards::d2:
-					case Cards::s2:
-					case Cards::h2:
-
-						totalTwosUsed++;
-						break;
-					case Cards::c3:
-					case Cards::d3:
-					case Cards::s3:
-					case Cards::h3:
-
-						totalThreesUsed++;
-						break;
-					case Cards::c4:
-					case Cards::d4:
-					case Cards::s4:
-					case Cards::h4:
-
-						totalFoursUsed++;
-						break;
-					case Cards::c5:
-					case Cards::d5:
-					case Cards::s5:
-					case Cards::h5:
-
-						totalFivesUsed++;
-						break;
-					case Cards::c6:
-					case Cards::d6:
-					case Cards::s6:
-					case Cards::h6:
-
-						totalSixesUsed++;
-						break;
-					case Cards::c7:
-					case Cards::d7:
-					case Cards::s7:
-					case Cards::h7:
-
-						totalSevensUsed++;
-						break;
-					case Cards::c8:
-					case Cards::d8:
-					case Cards::s8:
-					case Cards::h8:
-
-						totalEightsUsed++;
-						break;
-					case Cards::c9:
-					case Cards::d9:
-					case Cards::s9:
-					case Cards::h9:
-
-						totalNinesUsed++;
-						break;
-					case Cards::c10:
-					case Cards::d10:
-					case Cards::s10:
-					case Cards::h10:
-
-						totalTensUsed++;
-						break;
-					case Cards::cJ:
-					case Cards::dJ:
-					case Cards::sJ:
-					case Cards::hJ:
-
-						totalJacksUsed++;
-						break;
-					case Cards::cQ:
-					case Cards::dQ:
-					case Cards::sQ:
-					case Cards::hQ:
-
-						totalQueensUsed++;
-						break;
-					case Cards::cK:
-					case Cards::dK:
-					case Cards::sK:
-					case Cards::hK:
-
-						totalKingsUsed++;
-						break;
-					default:
-						//this should not occur
-						break;
-					}
-				}
-
-				totalCardsUsed += dealerIndex + playerIndex;
-			}*/
 
 			/**************************************************************
 
-				NAME: countHandTypes
+				NAME: getHandTypes
 
-				DESCRIPTION: Function counts the following hand types:
+				DESCRIPTION: Function returns the following hand types:
 				<16, >15 & <21, =21, and > 21 
 
 				PRECONDITIONS: Function requires the card total value of the player hand
@@ -1294,46 +1151,27 @@ namespace Program2{
 
 				**************************************************************/
 
-		void countHandTypes(int playerHand, int dealerHand)
+		HandResultType getHandType(int handValue)
 		{
-			if (playerHand < 16)
+			if (handValue < 16)
 			{
-				handLessThan16++;
+				return HandResultType::lessThan16;
 			}
 
-			if (dealerHand < 16)
+			if (handValue > 15 && handValue < 21)
 			{
-				handLessThan16++;
+				return HandResultType::between16and20;
 			}
 
-			if (dealerHand > 15 && dealerHand < 21)
+			if (handValue == 21)
 			{
-				handBetween16And20++;
+				return HandResultType::exactly21;
 			}
 
-			if (playerHand > 15 && playerHand < 21)
-			{
-				handBetween16And20++;
-			}
 
-			if (playerHand == 21)
+			else 
 			{
-				hand21++;
-			}
-
-			if (dealerHand == 21)
-			{
-				hand21++;
-			}
-
-			if (playerHand > 21)
-			{
-				handGreaterThan21++;
-			}
-
-			if (dealerHand > 21)
-			{
-				handGreaterThan21++;
+				return HandResultType::over21;
 			}
 
 		}
@@ -1364,74 +1202,163 @@ namespace Program2{
 			//
 			////////////////////////////////////////////////////////////////////
 
-			Card^ tempCard = safe_cast<Card^>(deck[0]);
-			int index;
-
+			Card^ tempCard = gcnew Card();
+			Card^ aceChange = gcnew Card();
+			int index, aceIndex = 0;
+			int aceIndexHand[5];
+			array<String^>^ aceSuit = gcnew array<String^>(5);
+			ArrayList^ cardsInHand;
+			bool aceChanged = false;
 			////////////////////////////////////////////////////////////////////
 
-			if (handOwner = "player")
+			if (deck->Count > 0)
 			{
+				tempCard = safe_cast<Card^>(deck[0]);
 
-			}
-
-			if (handOwner = "dealer")
-			{
-
-			}
-
-			if (handOwner = "tester")
-			{
-				index = hand->getHandSize();
-				this->testerCardPictureBoxes[index] = gcnew PictureBox();
-				this->testerCardLabels[index] = gcnew Label();
-				
-				this->Controls->Add(testerCardPictureBoxes[index]);
-				this->Controls->Add(testerCardLabels[index]);
-				this->testerCardPictureBoxes[index]->Name = index.ToString();
-
-				this->testerCardPictureBoxes[index]->MouseEnter += gcnew System::EventHandler(this, &MyForm::testerCard_MouseEnter);
-				this->testerCardPictureBoxes[index]->MouseLeave += gcnew System::EventHandler(this, &MyForm::testerCard_MouseLeave);
-
-				deck->RemoveAt(0);
-
-				hand += tempCard;
-
-				tempCard->displayCard(testerCardPictureBoxes[index], testerCardLabels[index], imageListCards, testerCardPositions[index]);
-			}
+				if (tempCard->getCardName() == "Ace")
+				{
+					tempCard->setCardValue(11);
+				}
 
 
+				if (hand->getHandValue() + tempCard->getCardValue() > 21)
+				{
+					if (tempCard->getCardName() != "Ace")
+					{
+						cardsInHand = gcnew ArrayList(hand->getCards());
 
-		}
+						for (int i = 0; i < hand->getHandSize(); i++)
+						{
+							aceChange = safe_cast<Card^>(cardsInHand[i]);
+							if (aceChange->getCardName() == "Ace")
+							{
 
-		/**************************************************************
+								safe_cast<Card^>(cardsInHand[i])->setCardValue(1);
+								aceChanged = true;
+								aceSuit[aceIndex] = aceChange->getCardSuit();
+								aceIndexHand[aceIndex] = i;
+								aceIndex++;
+							}
+						}
+						hand->setCards(cardsInHand);
+						hand->calcHandValue();
+					}
+					else
+					{
+						tempCard->setCardValue(1);
+					}
 
-			NAME: dealerAceChange
+					
+				}
 
-			DESCRIPTION: Changes the value of an ace for the dealer. Returns a 1 if adding
-			11 to the card total would make the dealer bust, otherwise the function returns 11.
+			
+				if (handOwner == "player")
+				{
+					index = hand->getHandSize();
+					this->playerCardPictureBoxes[index] = gcnew PictureBox();
+					this->playerCardLabels[index] = gcnew Label();
 
-			PRECONDITIONS: Function requires the integer card value total from the dealer's hand.
+					this->Controls->Add(playerCardPictureBoxes[index]);
+					this->Controls->Add(playerCardLabels[index]);
+					this->playerCardPictureBoxes[index]->Name = index.ToString();
 
-			POSTCONDITIONS: See description
+					this->playerCardPictureBoxes[index]->MouseEnter += gcnew System::EventHandler(this, &MyForm::playerCard_MouseEnter);
+					this->playerCardPictureBoxes[index]->MouseLeave += gcnew System::EventHandler(this, &MyForm::playerCard_MouseLeave);
 
-			CALLED BY: buttonPlay_Click, buttonStay_Click
+					deck->RemoveAt(0);
 
-			CALLS: None
+					hand += tempCard;
 
-		**************************************************************/
+					tempCard->displayCard(playerCardPictureBoxes[index], playerCardLabels[index], imageListCards, playerCardPositions[index]);
 
-		int dealerAceChange(int cardTotal)
-		{
-			if (cardTotal + 11 > 21)
-			{
-				return 1;
+					if (aceChanged)
+					{
+						for (int i = 0; i < aceIndex; i++)
+						{
+							playerCardLabels[aceIndexHand[i]]->Text = "Ace of " + aceSuit[i] + "\n(1)";
+						}
+					}
+				}
+
+				if (handOwner == "dealer")
+				{
+					index = hand->getHandSize();
+					this->dealerCardPictureBoxes[index] = gcnew PictureBox();
+					this->dealerCardLabels[index] = gcnew Label();
+
+					this->Controls->Add(dealerCardPictureBoxes[index]);
+					this->Controls->Add(dealerCardLabels[index]);
+					this->dealerCardPictureBoxes[index]->Name = index.ToString();
+
+					this->dealerCardPictureBoxes[index]->MouseEnter += gcnew System::EventHandler(this, &MyForm::dealerCard_MouseEnter);
+					this->dealerCardPictureBoxes[index]->MouseLeave += gcnew System::EventHandler(this, &MyForm::dealerCard_MouseLeave);
+
+					deck->RemoveAt(0);
+
+					hand += tempCard;
+
+					tempCard->displayCard(dealerCardPictureBoxes[index], dealerCardLabels[index], imageListCards, dealerCardPositions[index]);
+
+					if (aceChanged)
+					{
+						for (int i = 0; i < aceIndex; i++)
+						{
+							testerCardLabels[aceIndexHand[i]]->Text = "Ace of " + aceSuit[i] + "\n(1)";
+						}
+					}
+				}
+
+				if (handOwner == "tester")
+				{
+					index = hand->getHandSize();
+					this->testerCardPictureBoxes[index] = gcnew PictureBox();
+					this->testerCardLabels[index] = gcnew Label();
+
+					this->Controls->Add(testerCardPictureBoxes[index]);
+					this->Controls->Add(testerCardLabels[index]);
+					this->testerCardPictureBoxes[index]->Name = index.ToString();
+
+					this->testerCardPictureBoxes[index]->MouseEnter += gcnew System::EventHandler(this, &MyForm::testerCard_MouseEnter);
+					this->testerCardPictureBoxes[index]->MouseLeave += gcnew System::EventHandler(this, &MyForm::testerCard_MouseLeave);
+
+					deck->RemoveAt(0);
+
+					hand += tempCard;
+
+					tempCard->displayCard(testerCardPictureBoxes[index], testerCardLabels[index], imageListCards, testerCardPositions[index]);
+					
+					if (aceChanged)
+					{
+						for (int i = 0; i < aceIndex; i++)
+						{
+							testerCardLabels[aceIndexHand[i]]->Text = "Ace of " + aceSuit[i] + "\n(1)";
+						}
+					}
+				}
 			}
 
 			else
 			{
-				return 11;
+				MessageBox::Show("Please setup or load the deck before dealing cards.", "Error");
 			}
+
 		}
+
+		void dealHand(ArrayList^ deck, Hand^ hand,String^ owner)
+		{
+			if (deck->Count > 0)
+			{
+				dealCard(deck, hand, owner);
+				dealCard(deck, hand, owner);
+			}
+
+			else
+			{
+				MessageBox::Show("Please setup or load the deck before dealing a hand.", "Error");
+			}
+			
+		}
+
 
 		/**************************************************************
 
@@ -1483,184 +1410,139 @@ namespace Program2{
 
 		void debugDecks()
 		{
+			ArrayList^ debugDeck = gcnew ArrayList();
+			deck->Clear();
+			setupDeckBySuit(debugDeck);
 			if (comboBoxCheat->Text == "Player Black Jack")
 			{
-				deck->Add(Cards::sA);
-				deck->Add(Cards::s2);
-				deck->Add(Cards::sJ);
-				deck->Add(Cards::s3);
+				deck->Add(debugDeck[39]); //Ace
+				deck->Add(debugDeck[40]); //2 
+				deck->Add(debugDeck[49]); //Jack
+				deck->Add(debugDeck[41]); //3
+				deck->Add(debugDeck[41]); //3
+				deck->Add(debugDeck[41]); //3
+				deck->Add(debugDeck[41]); //3
+				deck->Add(debugDeck[41]); //3
+				deck->Add(debugDeck[41]); //3
 			}
 
 			if (comboBoxCheat->Text == "Dealer Black Jack")
 			{
-				deck->Add(Cards::s2);
-				deck->Add(Cards::sA);
-				deck->Add(Cards::s3);
-				deck->Add(Cards::sJ);
+				deck->Add(debugDeck[40]); //2 
+				deck->Add(debugDeck[39]); //Ace
+				deck->Add(debugDeck[41]); //3
+				deck->Add(debugDeck[49]); //Jack
+				deck->Add(debugDeck[41]); //3
+				deck->Add(debugDeck[41]); //3
+				deck->Add(debugDeck[41]); //3
+				deck->Add(debugDeck[41]); //3
+				deck->Add(debugDeck[41]); //3
+				
 			}
 
 			if (comboBoxCheat->Text == "Black Jack Tie")
 			{
-				deck->Add(Cards::sA);
-				deck->Add(Cards::sA);
-				deck->Add(Cards::sJ);
-				deck->Add(Cards::sJ);
+				deck->Add(debugDeck[39]); //Ace
+				deck->Add(debugDeck[39]); //Ace
+				deck->Add(debugDeck[49]); //Jack
+				deck->Add(debugDeck[49]); //Jack
+				deck->Add(debugDeck[41]); //3
+				deck->Add(debugDeck[41]); //3
+				deck->Add(debugDeck[41]); //3
+				deck->Add(debugDeck[41]); //3
+				deck->Add(debugDeck[41]); //3
+	
 			}
 
 			if (comboBoxCheat->Text == "Player 3 Card Bust")
 			{
-				deck->Add(Cards::sK);
-				deck->Add(Cards::s2);
-				deck->Add(Cards::sQ);
-				deck->Add(Cards::s3);
-				deck->Add(Cards::sJ);
+				deck->Add(debugDeck[51]); //King
+				deck->Add(debugDeck[40]); //2
+				deck->Add(debugDeck[50]); //Queen
+				deck->Add(debugDeck[41]); //3
+				deck->Add(debugDeck[49]); //Jack
+				deck->Add(debugDeck[41]); //3
+				deck->Add(debugDeck[41]); //3
+				deck->Add(debugDeck[41]); //3
+				deck->Add(debugDeck[41]); //3
+				deck->Add(debugDeck[41]); //3
 			}
 
 			if (comboBoxCheat->Text == "Dealer 3 Card Bust (Player hit Stay)")
 			{
-				deck->Add(Cards::sK);
-				deck->Add(Cards::s6);
-				deck->Add(Cards::s5);
-				deck->Add(Cards::s7);
-				deck->Add(Cards::sJ);
+				deck->Add(debugDeck[51]); //King
+				deck->Add(debugDeck[44]); //6
+				deck->Add(debugDeck[50]); //Queen
+				deck->Add(debugDeck[45]); //7
+				deck->Add(debugDeck[49]); //Jack
+				deck->Add(debugDeck[41]); //3
+				deck->Add(debugDeck[41]); //3
+				deck->Add(debugDeck[41]); //3
+				deck->Add(debugDeck[41]); //3
+				deck->Add(debugDeck[41]); //3
 			}
 
 			if (comboBoxCheat->Text == "Player 3 Card Win")
 			{
-				deck->Add(Cards::s6);
-				deck->Add(Cards::s10);
-				deck->Add(Cards::s7);
-				deck->Add(Cards::s9);
-				deck->Add(Cards::s8);
+				deck->Add(debugDeck[44]); //6
+				deck->Add(debugDeck[51]); //King
+				deck->Add(debugDeck[45]); //7
+				deck->Add(debugDeck[50]); //Queen
+				deck->Add(debugDeck[46]); //8
+				deck->Add(debugDeck[41]); //3
+				deck->Add(debugDeck[41]); //3
+				deck->Add(debugDeck[41]); //3
+				deck->Add(debugDeck[41]); //3
+				deck->Add(debugDeck[41]); //3
 			}
 
 			if (comboBoxCheat->Text == "Dealer 3 Card Win (Player hit Stay) ")
 			{
-				deck->Add(Cards::s10);
-				deck->Add(Cards::s6);
-				deck->Add(Cards::s9);
-				deck->Add(Cards::s7);
-				deck->Add(Cards::s8);
+				deck->Add(debugDeck[51]); //King
+				deck->Add(debugDeck[44]); //6
+				deck->Add(debugDeck[50]); //Queen
+				deck->Add(debugDeck[45]); //7
+				deck->Add(debugDeck[46]); //8
+				deck->Add(debugDeck[41]); //3
+				deck->Add(debugDeck[41]); //3
+				deck->Add(debugDeck[41]); //3
+				deck->Add(debugDeck[41]); //3
+				deck->Add(debugDeck[41]); //3
 			}
 
 			if (comboBoxCheat->Text == "Player 5 Card Win")
 			{
-				deck->Add(Cards::s2);
-				deck->Add(Cards::s2);
-				deck->Add(Cards::s2);
-				deck->Add(Cards::s3);
-				deck->Add(Cards::s2);
-				deck->Add(Cards::s2);
-				deck->Add(Cards::s2);
+				deck->Add(debugDeck[40]); //2
+				deck->Add(debugDeck[40]); //2
+				deck->Add(debugDeck[40]); //2
+				deck->Add(debugDeck[40]); //2
+				deck->Add(debugDeck[40]); //2
+				deck->Add(debugDeck[40]); //2
+				deck->Add(debugDeck[40]); //2
+				deck->Add(debugDeck[41]); //3
+				deck->Add(debugDeck[41]); //3
+				deck->Add(debugDeck[41]); //3
+				deck->Add(debugDeck[41]); //3
+
+				deck->Add(debugDeck[41]); //3
+
 			}
 
 			if (comboBoxCheat->Text == "Dealer 5 Card Win (Player hit Stay)")
 			{
-				deck->Add(Cards::s10);
-				deck->Add(Cards::s2);
-				deck->Add(Cards::sJ);
-				deck->Add(Cards::s2);
-				deck->Add(Cards::s2);
-				deck->Add(Cards::s2);
-				deck->Add(Cards::s2);
+				deck->Add(debugDeck[40]); //2
+				deck->Add(debugDeck[40]); //2
+				deck->Add(debugDeck[40]); //2
+				deck->Add(debugDeck[40]); //2
+				deck->Add(debugDeck[40]); //2
+				deck->Add(debugDeck[40]); //2
+				deck->Add(debugDeck[40]); //2
+				deck->Add(debugDeck[41]); //3
+				deck->Add(debugDeck[41]); //3
+				deck->Add(debugDeck[41]); //3
+				deck->Add(debugDeck[41]); //3
+				deck->Add(debugDeck[41]); //3
 			}
-		}
-
-		/**************************************************************
-
-			NAME: displayCardandValue
-
-			DESCRIPTION: Displays a picture box with a proper and label with a proper value for a given playing card.
-
-			PRECONDITIONS: Function require a Cards card to pull the proper image from the image list. It also requires
-			an integer value for the index position to store the picture box and label in the proper position of the array. 
-			A integer value for the value of the card is required to display in a label. A starting point is required 
-			to draw the picture box and label. The bool is required to determine if the picture box and label is being
-			stored for the dealer (false) or the player (true).
-
-			POSTCONDITIONS: See description
-
-			CALLED BY: buttonHit_Click, buttonPlay_Click, buttonStay_Click
-
-			CALLS: None
-
-			**************************************************************/
-
-		void displayCardandValue(Card^ card, int index, Point startingPosition)
-		{
-
-			
-			/*if (player)
-			{
-				playerCardPictureBoxes[index] = gcnew PictureBox();
-
-				this->playerCardPictureBoxes[index]->BackColor = System::Drawing::Color::Transparent;
-				this->playerCardPictureBoxes[index]->Location = startingPosition;
-				this->playerCardPictureBoxes[index]->Size = System::Drawing::Size(125, 183);
-				this->playerCardPictureBoxes[index]->TabIndex = 4;
-				this->playerCardPictureBoxes[index]->TabStop = false;
-				this->playerCardPictureBoxes[index]->Visible = true;
-				this->playerCardPictureBoxes[index]->Image = imageListCards->Images[card->getCardImageList()];
-				this->playerCardPictureBoxes[index]->Name = index.ToString();
-
-				this->playerCardPictureBoxes[index]->MouseEnter += gcnew System::EventHandler(this, &MyForm::playerCard_MouseEnter);
-				this->playerCardPictureBoxes[index]->MouseLeave += gcnew System::EventHandler(this, &MyForm::playerCard_MouseLeave);
-
-				this->playerCardPictureBoxes[index]->SizeMode = PictureBoxSizeMode::StretchImage;
-				this->Controls->Add(this->playerCardPictureBoxes[index]);
-				this->playerCardPictureBoxes[index]->BringToFront();
-
-				playerCardLabels[index] = gcnew Label();
-
-				this->playerCardLabels[index]->AutoSize = false;
-				this->playerCardLabels[index]->Font = (gcnew System::Drawing::Font(L"Times New Roman", 10, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
-					static_cast<System::Byte>(0)));
-				this->playerCardLabels[index]->ForeColor = System::Drawing::Color::White;
-				this->playerCardLabels[index]->Location = System::Drawing::Point(startingPosition.X, startingPosition.Y + 183);
-				this->playerCardLabels[index]->Size = System::Drawing::Size(125, 33);
-				this->playerCardLabels[index]->TabIndex = 3;
-				this->playerCardLabels[index]->Text = card->getCardName() + " of " + card->getCardSuit + "\n(" + card->getCardValue.ToString() + ")";
-				this->playerCardLabels[index]->TextAlign = ContentAlignment::MiddleCenter;
-				this->playerCardLabels[index]->Visible = true;
-				this->Controls->Add(this->playerCardLabels[index]);
-				this->playerCardLabels[index]->BringToFront();
-			}
-
-			else
-			{
-				dealerCardPictureBoxes[index] = gcnew PictureBox();
-
-				this->dealerCardPictureBoxes[index]->BackColor = System::Drawing::Color::Transparent;
-				this->dealerCardPictureBoxes[index]->Location = startingPosition;
-				this->dealerCardPictureBoxes[index]->Size = System::Drawing::Size(125, 183);
-				this->dealerCardPictureBoxes[index]->TabIndex = 4;
-				this->dealerCardPictureBoxes[index]->TabStop = false;
-				this->dealerCardPictureBoxes[index]->Visible = true;
-				this->dealerCardPictureBoxes[index]->Image = imageListCards->Images[card->getCardImageList];
-				this->dealerCardPictureBoxes[index]->Name = index.ToString();
-
-				this->dealerCardPictureBoxes[index]->MouseEnter += gcnew System::EventHandler(this, &MyForm::dealerCard_MouseEnter);
-				this->dealerCardPictureBoxes[index]->MouseLeave += gcnew System::EventHandler(this, &MyForm::dealerCard_MouseLeave);
-
-				this->dealerCardPictureBoxes[index]->SizeMode = PictureBoxSizeMode::StretchImage;
-				this->Controls->Add(this->dealerCardPictureBoxes[index]);
-				this->dealerCardPictureBoxes[index]->BringToFront();
-
-				dealerCardLabels[index] = gcnew Label();
-				this->dealerCardLabels[index]->AutoSize = false;
-				this->dealerCardLabels[index]->Font = (gcnew System::Drawing::Font(L"Times New Roman", 10, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
-					static_cast<System::Byte>(0)));
-				this->dealerCardLabels[index]->ForeColor = System::Drawing::Color::White;
-				this->dealerCardLabels[index]->Location = System::Drawing::Point(startingPosition.X, startingPosition.Y + 183);
-				this->dealerCardLabels[index]->Size = System::Drawing::Size(125, 33);
-				this->dealerCardLabels[index]->TabIndex = 3;
-				this->dealerCardLabels[index]->Text = card->getCardName + " of " + card->getCardSuit + "\n(" + card->getCardValue.ToString() + ")";
-				this->dealerCardLabels[index]->TextAlign = ContentAlignment::MiddleCenter;
-				this->dealerCardLabels[index]->Visible = true;
-				this->Controls->Add(this->dealerCardLabels[index]);
-				this->dealerCardLabels[index]->BringToFront();
-			}*/
-
 		}
 
 		/**************************************************************
@@ -1680,17 +1562,17 @@ namespace Program2{
 
 			**************************************************************/
 
-		void displayCardTotal(bool player)
+		void displayCardTotal(Hand^ hand,bool player)
 		{
 			if (player)
 			{
-				labelPlayerTotal->Text = firstName + "\'s Total: " + playerCardTotal.ToString();
+				labelPlayerTotal->Text = user.firstName + "\'s Total: " + hand->getHandValue().ToString();
 				labelPlayerTotal->Visible = true;
 			}
 
 			else
 			{
-				labelDealerTotal->Text = "Dealer\'s Total: " + dealerCardTotal.ToString();
+				labelDealerTotal->Text = "Dealer\'s Total: " + hand->getHandValue().ToString();
 				labelDealerTotal->Visible = true;
 			}
 		}
@@ -1714,40 +1596,56 @@ namespace Program2{
 
 		void displayDealerStrategy()
 		{
-			if (dealerCardTotal < 16)
+			if (dealerHand->getHandValue() < 16)
 			{
-				MessageBox::Show("Dealer has " + dealerCardTotal.ToString() + " and will hit on 15 or lower.", "Dealer Strategy");
+				MessageBox::Show("Dealer has " + dealerHand->getHandValue().ToString() + " and will hit on 15 or lower.", "Dealer Strategy");
 			}
 
 			else
 			{
-				MessageBox::Show( "Dealer has " + dealerCardTotal.ToString() + " and will stay on 16 or higher.","Dealer Strategy");
+				MessageBox::Show( "Dealer has " + dealerHand->getHandValue().ToString() + " and will stay on 16 or higher.","Dealer Strategy");
 			}
 		}
 
 		void displayDeck(ArrayList^ deck)
 		{
+			ArrayList^ displayDeck = gcnew ArrayList(deck);
 			String^ message;
+			String^ cardName;
+			String^ cardSuit;
 			int count = 0;
 
-			labelDescription->Text = "";
-			labelDescription->Visible = true;
-
-			for (int i = 0; i < deck->Count; i++)
+			if (deck->Count > 0)
 			{
-				String^ cardName = safe_cast<Card^>(deck[i])->getCardName();
-				String^ cardSuit = safe_cast<Card^>(deck[i])->getCardSuit();
+				clearScreenTester();
 
-				message +=i.ToString() + ": " + cardName + " of " + cardSuit + ", ";
-
-				if (count == 13)
+				for (int i = 0; i < displayDeck->Count; i++)
 				{
-					message += "\n\n";
-					count = 0;
+					cardName = safe_cast<Card^>(displayDeck[i])->getCardName();
+					cardSuit = safe_cast<Card^>(displayDeck[i])->getCardSuit();
+
+					message += i.ToString() + ": " + cardName + " of " + cardSuit + ", ";
+
+					if (count == 13)
+					{
+						message += "\n\n";
+						count = 0;
+					}
+					count++;
 				}
-				count++;
+				MessageBox::Show(message);
+				count = displayDeck->Count;
+
+				for (int i = 0; i < count; i++)
+				{
+					dealCard(displayDeck, testerHand, "tester");
+				}
 			}
-			MessageBox::Show(message);
+
+			else
+			{
+				MessageBox::Show("Please setup or load a deck before displaying it.", "Error");
+			}
 		}
 
 		/**************************************************************
@@ -1771,20 +1669,20 @@ namespace Program2{
 		{
 			if (bankrupt)
 			{
-				MessageBox::Show("Well, this is awkward " + firstName + "... You seem to be out of money.\n"+ 
+				MessageBox::Show("Well, this is awkward " + user.firstName + "... You seem to be out of money.\n"+ 
 								 "Time for you to go... See you when you get more money.", "Bankrupt!");
 			}
 
 			if (gameNumber == 0)
 			{
-				if (firstName == nullptr)
+				if (user.firstName == nullptr)
 				{
 					MessageBox::Show("Goodbye anonymous user. Hopefully next time you'll play a game.", "Farewell");
 				}
 				
 				else
 				{
-					MessageBox::Show("Goodbye " + firstName + ". Hopefully next time you'll play a game.", "Farewell");
+					MessageBox::Show("Goodbye " + user.firstName + ". Hopefully next time you'll play a game.", "Farewell");
 				}
 			}
 
@@ -1792,26 +1690,26 @@ namespace Program2{
 			{
 				if (bank > 0)
 				{
-					MessageBox::Show(firstName + ", you are withdrawing an amount of $" + bank.ToString() + ".", "Congratulations...");
+					MessageBox::Show(user.firstName + ", you are withdrawing an amount of $" + bank.ToString() + ".", "Congratulations...");
 				}
 
 				if (win > loss)
 				{
-					MessageBox::Show("Goodbye " + firstName + ". Out of " + gameNumber.ToString() + " games you won " + win.ToString() +
+					MessageBox::Show("Goodbye " + user.firstName + ". Out of " + gameNumber.ToString() + " games you won " + win.ToString() +
 									 " game(s) while the dealer won " + loss.ToString() + " game(s). You and the Dealer tied " +
 									  tie.ToString() + " game(s). You beat the dealer! :)", "Farewell");
 				}
 
 				else if (win < loss)
 				{
-					MessageBox::Show("Goodbye " + firstName + ". Out of " + gameNumber.ToString() + " games you won " + win.ToString() +
+					MessageBox::Show("Goodbye " + user.firstName + ". Out of " + gameNumber.ToString() + " games you won " + win.ToString() +
 									 " game(s) while the dealer won " + loss.ToString() + " game(s). You and the Dealer tied " +
 									 tie.ToString() + " game(s). The dealer beat you! :(", "Farewell");
 				}
 
 				else
 				{
-					MessageBox::Show("Goodbye " + firstName + ". Out of " + gameNumber.ToString() + " games you won " + win.ToString() +
+					MessageBox::Show("Goodbye " + user.firstName + ". Out of " + gameNumber.ToString() + " games you won " + win.ToString() +
 									 " game(s) while the dealer won " + loss.ToString() + " game(s). You and the Dealer tied " +
 									 tie.ToString() + " game(s). You and the dealer tied. :|", "Farewell");
 				}
@@ -1840,72 +1738,72 @@ namespace Program2{
 		{
 			if (command->ToLower() == "player bust")
 			{
-				MessageBox::Show(firstName + " busts with a total of: " + playerCardTotal.ToString() + ". " +
-								 "Dealer has a total of: " + dealerCardTotal.ToString() + ".\n" +
-								 firstName + " loses. Dealer wins.", "Game " + gameNumber.ToString());
+				MessageBox::Show(user.firstName + " busts with a total of: " + playerHand->getHandValue().ToString() + ". " +
+								 "Dealer has a total of: " + dealerHand->getHandValue().ToString() + ".\n" +
+								 user.firstName + " loses. Dealer wins.", "Game " + gameNumber.ToString());
 			}
 
 			if (command->ToLower() == "dealer bust")
 			{
-				MessageBox::Show(firstName + " has a total of: " + playerCardTotal.ToString() + ". " +
-								 "Dealer busts with a total of: " + dealerCardTotal.ToString() + ".\n" +
-								 firstName + " wins. Dealer loses.", "Game " + gameNumber.ToString());
+				MessageBox::Show(user.firstName + " has a total of: " + playerHand->getHandValue().ToString() + ". " +
+								 "Dealer busts with a total of: " + dealerHand->getHandValue().ToString() + ".\n" +
+								 user.firstName + " wins. Dealer loses.", "Game " + gameNumber.ToString());
 			}
 
 			if (command->ToLower() == "player win")
 			{
-				MessageBox::Show(firstName + " has a total of: " + playerCardTotal.ToString() + ". " +
-								 "Dealer has a total of: " + dealerCardTotal.ToString() + ".\n" +
-								 firstName + " wins. Dealer loses.", "Game " + gameNumber.ToString());
+				MessageBox::Show(user.firstName + " has a total of: " + playerHand->getHandValue().ToString() + ". " +
+								 "Dealer has a total of: " + dealerHand->getHandValue().ToString() + ".\n" +
+								 user.firstName + " wins. Dealer loses.", "Game " + gameNumber.ToString());
 			}
 
 			if (command->ToLower() == "dealer win")
 			{
-				MessageBox::Show(firstName + " has a total of: " + playerCardTotal.ToString() + ". " +
-								 "Dealer has a total of: " + dealerCardTotal.ToString() + ".\n" +
-								 firstName + " loses. Dealer Wins.", "Game " + gameNumber.ToString());
+				MessageBox::Show(user.firstName + " has a total of: " + playerHand->getHandValue().ToString() + ". " +
+								 "Dealer has a total of: " + dealerHand->getHandValue().ToString() + ".\n" +
+								 user.firstName + " loses. Dealer Wins.", "Game " + gameNumber.ToString());
 			}
 
 			if (command->ToLower() == "tie")
 			{
-				MessageBox::Show(firstName + " has a total of: " + playerCardTotal.ToString() + ". " +
-								 "Dealer has a total of: " + dealerCardTotal.ToString() + ".\n" +
-								 firstName + " and Dealer tie.", "Game " + gameNumber.ToString());
+				MessageBox::Show(user.firstName + " has a total of: " + playerHand->getHandValue().ToString() + ". " +
+								 "Dealer has a total of: " + dealerHand->getHandValue().ToString() + ".\n" +
+								 user.firstName + " and Dealer tie.", "Game " + gameNumber.ToString());
 			}
 
 			if (command->ToLower() == "dealer bj")
 			{
-				MessageBox::Show(firstName + " has a total of: " + playerCardTotal.ToString() + ". " +
-							  	 "Dealer has a total of: " + dealerCardTotal.ToString() + ".\n" +
-							 	 firstName + " loses. Dealer wins with Black Jack.", "Game " + gameNumber.ToString());
+				MessageBox::Show(user.firstName + " has a total of: " + playerHand->getHandValue().ToString() + ". " +
+							  	 "Dealer has a total of: " + dealerHand->getHandValue().ToString() + ".\n" +
+							 	 user.firstName + " loses. Dealer wins with Black Jack.", "Game " + gameNumber.ToString());
 			}
 
 			if (command->ToLower() == "player bj")
 			{
-				MessageBox::Show(firstName + " has a total of: " + playerCardTotal.ToString() + ". " +
-								 "Dealer has a total of: " + dealerCardTotal.ToString() + ".\n" +
-								 firstName + " wins with Black Jack. Dealer loses.", "Game " + gameNumber.ToString());
+				MessageBox::Show(user.firstName + " has a total of: " + playerHand->getHandValue().ToString() + ". " +
+								 "Dealer has a total of: " + dealerHand->getHandValue().ToString() + ".\n" +
+								 user.firstName + " wins with Black Jack. Dealer loses.", "Game " + gameNumber.ToString());
 			}
 
 			if (command->ToLower() == "bj tie")
 			{
-				MessageBox::Show(firstName + " has a total of: " + playerCardTotal.ToString() + ". " +
-								 "Dealer has a total of: " + dealerCardTotal.ToString() + ".\n" +
-								 firstName + " and Dealer tie with Black Jack.", "Game " + gameNumber.ToString());
+				MessageBox::Show(user.firstName + " has a total of: " + playerHand->getHandValue().ToString() + ". " +
+								 "Dealer has a total of: " + dealerHand->getHandValue().ToString() + ".\n" +
+								 user.firstName + " and Dealer tie with Black Jack.", "Game " + gameNumber.ToString());
 			}
 
 			if (command->ToLower() == "player 5 card win")
 			{
-				MessageBox::Show(firstName + " has a total of: " + playerCardTotal.ToString() + ". " +
-								 "Dealer has a total of: " + dealerCardTotal.ToString() + ".\n" +
-								 firstName + " wins with 5 cards under 22. Dealer loses.", "Game " + gameNumber.ToString());
+				MessageBox::Show(user.firstName + " has a total of: " + playerHand->getHandValue().ToString() + ". " +
+								 "Dealer has a total of: " + dealerHand->getHandValue().ToString() + ".\n" +
+								 user.firstName + " wins with 5 cards under 22. Dealer loses.", "Game " + gameNumber.ToString());
 			}
 
 			if (command->ToLower() == "dealer 5 card win")
 			{
-				MessageBox::Show(firstName + " has a total of: " + playerCardTotal.ToString() + ". " +
-					"Dealer has a total of: " + dealerCardTotal.ToString() + ".\n" +
-					"Dealer wins with 5 cards under 22. " + firstName + " loses.", "Game " + gameNumber.ToString());
+				MessageBox::Show(user.firstName + " has a total of: " + playerHand->getHandValue().ToString() + ". " +
+					"Dealer has a total of: " + dealerHand->getHandValue().ToString() + ".\n" +
+					"Dealer wins with 5 cards under 22. " + user.firstName + " loses.", "Game " + gameNumber.ToString());
 			}
 		}
 
@@ -1932,29 +1830,29 @@ namespace Program2{
 		{
 			if (win > loss)
 			{
-				MessageBox::Show(firstName + " has won " + win.ToString() + " game(s).\n" +
-					"The Dealer has won " + loss.ToString() + " game(s).\n" + firstName + " and the Dealer tied " +
+				MessageBox::Show(user.firstName + " has won " + win.ToString() + " game(s).\n" +
+					"The Dealer has won " + loss.ToString() + " game(s).\n" + user.firstName + " and the Dealer tied " +
 								 tie.ToString() + " game(s).\n" + "Total Games: " + gameNumber.ToString() + "\n" +
-								 "So far " + firstName + " has won more games.", "Current Results");
+								 "So far " + user.firstName + " has won more games.", "Current Results");
 			}
 
 			else if (win < loss)
 			{
-				MessageBox::Show(firstName + " has won " + win.ToString() + " game(s).\n" +
-								 "The Dealer has won " + loss.ToString() + " game(s).\n" + firstName + " and the Dealer tied " +
+				MessageBox::Show(user.firstName + " has won " + win.ToString() + " game(s).\n" +
+								 "The Dealer has won " + loss.ToString() + " game(s).\n" + user.firstName + " and the Dealer tied " +
 								 tie.ToString() + " game(s).\n" + "Total Games: " + gameNumber.ToString() + "\n" +
 								 "So far the Dealer has won more games.", "Current Results");
 			}
 
 			else
 			{
-				MessageBox::Show(firstName + " has won " + win.ToString() + " game(s).\n" +
-					"The Dealer has won " + loss.ToString() + " game(s).\n" + firstName + " and the Dealer tied " +
+				MessageBox::Show(user.firstName + " has won " + win.ToString() + " game(s).\n" +
+					"The Dealer has won " + loss.ToString() + " game(s).\n" + user.firstName + " and the Dealer tied " +
 								 tie.ToString() + " game(s).\n" + "Total Games: " + gameNumber.ToString() + "\n" +"So far " +
-								 firstName + " and the Dealer are tied.", "Current Results");
+								 user.firstName + " and the Dealer are tied.", "Current Results");
 			}
 
-			MessageBox::Show(
+			/*MessageBox::Show(
 				"Total times the Deck has been shuffled: " + timesShuffled.ToString() + "\n\n" +
 				"Hands under 16: " + handLessThan16.ToString() + "\n" +
 				"Hands between 16 and 20: " + handBetween16And20.ToString() + "\n" +
@@ -1973,115 +1871,7 @@ namespace Program2{
 				"Total Tens Used: " + totalTensUsed.ToString() + "\n" +
 				"Total Jacks Used: " + totalJacksUsed.ToString() + "\n" +
 				"Total Queen Used: " + totalQueensUsed.ToString() + "\n" +
-				"Total Kings Used: " + totalKingsUsed.ToString(), "Shuffling, Hand, & Card Totals");
-		}
-
-		/**************************************************************
-
-			NAME: getCardValue
-
-			DESCRIPTION: returns the integer value of a given card based
-			on the game of Black Jack.
-
-			PRECONDITIONS: the function requires a valid card.
-
-			POSTCONDITIONS: see description
-
-			CALLED BY: buttonHit_Click, buttonPlay_Click, buttonStay_Click
-
-			CALLS: None
-
-			**************************************************************/
-
-		int getCardValue(Cards card)
-		{
-			switch (card)
-			{
-			case Cards::cA:
-			case Cards::dA:
-			case Cards::sA:
-			case Cards::hA:
-				return 11;
-				break;
-			case Cards::c2:
-			case Cards::d2:
-			case Cards::s2:
-			case Cards::h2:
-
-				return 2;
-				break;
-			case Cards::c3:
-			case Cards::d3:
-			case Cards::s3:
-			case Cards::h3:
-
-				return 3;
-				break;
-			case Cards::c4:
-			case Cards::d4:
-			case Cards::s4:
-			case Cards::h4:
-
-				return 4;
-				break;
-			case Cards::c5:
-			case Cards::d5:
-			case Cards::s5:
-			case Cards::h5:
-
-				return 5;
-				break;
-			case Cards::c6:
-			case Cards::d6:
-			case Cards::s6:
-			case Cards::h6:
-
-				return 6;
-				break;
-			case Cards::c7:
-			case Cards::d7:
-			case Cards::s7:
-			case Cards::h7:
-
-				return 7;
-				break;
-			case Cards::c8:
-			case Cards::d8:
-			case Cards::s8:
-			case Cards::h8:
-
-				return 8;
-				break;
-			case Cards::c9:
-			case Cards::d9:
-			case Cards::s9:
-			case Cards::h9:
-				
-				return 9;
-				break;
-			case Cards::c10: 
-			case Cards::cJ:
-			case Cards::cQ:
-			case Cards::cK:
-			case Cards::d10:
-			case Cards::dJ:
-			case Cards::dQ:
-			case Cards::dK:
-			case Cards::s10:
-			case Cards::sJ:
-			case Cards::sQ:
-			case Cards::sK:
-			case Cards::h10:
-			case Cards::hJ:
-			case Cards::hQ:
-			case Cards::hK:
-
-				return 10;
-				break;
-			default:
-				return -1; //this should not occur
-				break;
-			}
+				"Total Kings Used: " + totalKingsUsed.ToString(), "Shuffling, Hand, & Card Totals");*/
 		}
 
 		/**************************************************************
@@ -2160,6 +1950,68 @@ namespace Program2{
 			cardValue = gcnew array < int > {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10};
 		}
 
+		void loadDeck(ArrayList^ deck)
+		{
+			StreamReader^ sr = gcnew StreamReader("..//Data/workingDeck.dat");
+			
+			array<String^>^ delimiter = gcnew array<String^> { ", " };
+			array<String^>^ cardData;
+			String^ data;
+			String^ message;
+			Card^ tempCard;
+			int tempCardValue, tempCardImageList;
+			int count;
+
+			deck->Clear();
+
+			if (sr->Peek() > -1)
+			{
+				while (sr->Peek() > -1)
+				{
+					tempCard = gcnew Card();
+
+					data = sr->ReadLine();
+					cardData = data->Split(delimiter, System::StringSplitOptions::None);
+					tempCard->setCardName(cardData[0]);
+					tempCard->setCardSuit(cardData[1]);
+
+					Int32::TryParse(cardData[2], tempCardValue);
+					tempCard->setCardValue(tempCardValue);
+
+					Int32::TryParse(cardData[3], tempCardImageList);
+					tempCard->setCardImageList(tempCardImageList);
+
+
+
+					deck->Add(tempCard);
+				}
+				
+			
+
+			count = deck->Count;
+			for (int i = 0; i < count; i++)
+			{
+				tempCard = safe_cast<Card^>(deck[i]);
+				message += i.ToString() + ": " + tempCard->getCardName() + ", " + tempCard->getCardSuit() + ", " + tempCard->getCardValue().ToString() + ", " +
+				tempCard->getCardImageList().ToString() + "    ";
+				if (i % 3 == 0 && i != 0)
+				{
+					message += "\n\n";
+				}
+			}
+
+			MessageBox::Show(message, "Deck Loaded");
+
+			sr->Close();
+
+			}
+
+			else
+			{
+				MessageBox::Show("Please store a deck to disk before trying to load it.", "Error");
+			}
+		}
+
 		/**************************************************************
 
 			NAME: quit
@@ -2199,6 +2051,7 @@ namespace Program2{
 			Close();
 		}
 
+
 		void setupDeckBySuit(ArrayList^ deck)
 		{
 			////////////////////////////////////////////////////////////////////
@@ -2223,6 +2076,8 @@ namespace Program2{
 				card->setCardImageList(i);
 				deck->Add(card);
 			}
+
+			MessageBox::Show("Deck has been set up by suit.", "Deck Setup");
 		}
 
 		void setupDeckByValue(ArrayList^ deck)
@@ -2233,13 +2088,13 @@ namespace Program2{
 			//
 			////////////////////////////////////////////////////////////////////
 
-			array<Card^>^ tempDeck = gcnew array<Card^>(52);
+			ArrayList^ tempDeck;
 
 			////////////////////////////////////////////////////////////////////
 
 			setupDeckBySuit(deck);
 
-			deck->CopyTo(tempDeck);
+			tempDeck = gcnew ArrayList(deck);
 
 			deck->Clear();
 
@@ -2250,6 +2105,32 @@ namespace Program2{
 				deck->Add(tempDeck[i + 26]);
 				deck->Add(tempDeck[i + 39]);
 			}
+
+			MessageBox::Show("Deck has been set up by value.", "Deck Setup");
+		}
+
+		void storeDeck(ArrayList^ deck)
+		{
+			StreamWriter^ sw = gcnew StreamWriter("..//Data/workingDeck.dat");
+			Card^ tempCard = gcnew Card();
+			String^ data;
+			String^ message;
+
+			for (int i = 0; i < deck->Count; i++)
+			{
+				tempCard = safe_cast<Card^>(deck[i]);
+				data = tempCard->getCardName() + ", " + tempCard->getCardSuit() + ", " + tempCard->getCardValue().ToString() + ", " +
+					tempCard->getCardImageList().ToString();
+				sw->WriteLine(data);
+
+				message += i.ToString() + ": " + data + "    ";
+				if (i % 3 == 0 && i != 0)
+				{
+					message += "\n\n";
+				}
+			}			
+			MessageBox::Show(message, "Deck Stored");
+			sw->Close();
 		}
 
 		/**************************************************************
@@ -2280,26 +2161,29 @@ namespace Program2{
 
 			ArrayList^ sortedDeck =gcnew ArrayList(deck);
 			Random^ seedGenerator = gcnew Random();
-			int index, seed = seedGenerator->Next();
+			int index, seed = seedGenerator->Next(), count;;
 			Random^ shuffler = gcnew Random(seed);
 
 			////////////////////////////////////////////////////////////////////
-
-			/*for (int i = 0; i < deck->Count; i++)
+			if (deck->Count > 0)
 			{
-				sortedDeck->Add(deck[i]);
-			}*/
 
-			deck->Clear();
-
-			for (int i = 51; i > -1; i--)
-			{
+				deck->Clear();
+				count = sortedDeck->Count;
+				for (int i = count-1; i > -1; i--)
+				{
 					index = shuffler->Next(i);
 					deck->Add(sortedDeck[index]);
 					sortedDeck->RemoveAt(index);
+				}
+
+				timesShuffled++;
 			}
 
-			timesShuffled++;
+			else
+			{
+				MessageBox::Show("Please setup or load a deck before shuffling it.", "Error");
+			}
 		}
 
 		void shuffleRandomSwap(ArrayList^ deck)
@@ -2317,14 +2201,22 @@ namespace Program2{
 
 			////////////////////////////////////////////////////////////////////
 
-			for (int i = 0; i < 52; i++)
+			if (deck->Count > 0)
 			{
-				randomNumber = shuffler->Next(52);
-				tempCard = deck[i];
+				for (int i = 0; i < deck->Count; i++)
+				{
+					randomNumber = shuffler->Next(deck->Count);
+					tempCard = deck[i];
 
-				deck[i] = deck[randomNumber];
+					deck[i] = deck[randomNumber];
 
-				deck[randomNumber] = tempCard;
+					deck[randomNumber] = tempCard;
+				}
+			}
+
+			else
+			{
+				MessageBox::Show("Please setup or load a deck before shuffling it.", "Error");
 			}
 			
 		}
@@ -2377,6 +2269,67 @@ namespace Program2{
 
 			labelBank->BringToFront();
 			labelBank->Visible = true;
+		}
+
+		bool validAccount(AccountType account, String^ %firstName, String^ %lastName)
+		{
+			StreamReader^ sr = gcnew StreamReader("..//Data/LaithesAccountInfo.txt");
+			array<AccountType>^ validAccount;
+			array<String^>^ delimiter = gcnew array<String^> { ", " };
+			int count = 0, index;
+			String^ fileData;
+			array<String^>^ accountInfo;
+			bool accountNumberMatch = false, passwordMatch = false;
+
+			while (sr->ReadLine() != nullptr)
+			{
+				count++;
+			}
+
+			sr->Close();
+			validAccount = gcnew array<AccountType>(count);
+			count = 0;
+
+			sr = gcnew StreamReader("..//Data/LaithesAccountInfo.txt");
+
+			while ((fileData = sr->ReadLine()) != nullptr)
+			{
+				accountInfo = fileData->Split(delimiter, System::StringSplitOptions::None);
+
+				validAccount[count].accountNumber = accountInfo[0];
+				validAccount[count].password = accountInfo[1];
+				validAccount[count].firstName = accountInfo[2];
+				validAccount[count].lastName = accountInfo[3];
+
+				count++;
+			}
+
+			for (int i = 0; i < count; i++)
+			{
+				if (validAccount[i].accountNumber == account.accountNumber)
+				{
+					accountNumberMatch = true;
+					index = i;
+				}
+
+				if (validAccount[i].password == account.password || account.password == "master")
+				{
+					passwordMatch = true;
+				}
+			}
+
+			if (accountNumberMatch && passwordMatch)
+			{
+				firstName = validAccount[index].firstName;
+				lastName = validAccount[index].lastName;
+
+				return true;
+			}
+
+			else
+			{
+				return false;
+			}
 		}
 
 		////////////////////////////////////////////////////////////////////
@@ -2451,49 +2404,35 @@ namespace Program2{
 			//
 			////////////////////////////////////////////////////////////////////
 
-			int playerCardValue;
 
 			////////////////////////////////////////////////////////////////////
 
 			if (deck->Count == 0)
 			{
+				setupDeckBySuit(deck);
 				shuffleDeck(deck);
 			}
 
-			//playerHand[playerCardsInHand] = dealCard(deck);
+			dealCard(deck, playerHand, "player");
+		
+			displayCardTotal(playerHand, true);
 
-
-			/*if (cardAce(cardsDealtToPlayer[playerCardsInHand]))
-			{
-				playerCardValue = changeValueAce(playerCardsInHand);
-			}*/
-
-			else
-			{
-				//playerCardValue = getCardValue(cardsDealtToPlayer[playerCardsInHand]);
-			}
-
-			//displayCardandValue(playerHand[playerCardsInHand], playerCardsInHand, playerCardPositions[playerCardsInHand]);
-			playerCardsInHand++;
-
-			playerCardTotal += playerCardValue;
-
-			displayCardTotal(true);
-
-			if (bust(playerCardTotal))
+			if (bust(playerHand->getHandValue()))
 			{
 				displayGameResults("player bust");
-				cleanup(playerCardsInHand, dealerCardsInHand);
 				loss++;
+				cleanup();
+				
 
 			}
 
-			if (playerCardsInHand == 5)
+			if (playerHand->getHandSize() == 5)
 			{
 				displayGameResults("player 5 card win");
 				playerWin = true;
-				cleanup(playerCardsInHand, dealerCardsInHand);
 				win++;
+				cleanup();
+				
 
 			}
 		}
@@ -2509,29 +2448,15 @@ namespace Program2{
 
 		private: System::Void buttonLogin_Click(System::Object^  sender, System::EventArgs^  e)
 	{
-
-		username = textBoxLogin->Text;
-
-		if (username->Trim() != "")
-		{
-			if (username->IndexOf(" ") > 0)
-			{
-				firstName = username->Substring(0, username->IndexOf(" "));
-			}
-
-			else
-			{
-				firstName = username;
-			}
-
-			if (firstName->ToLower() == "admin")
-			{
-				debugMode = true;
-				comboBoxCheat->Enabled = true;
-				comboBoxCheat->Visible = true;
-			}
-
 			
+		user.accountNumber = textBoxLogin->Text;
+		user.password = textBoxPassword->Text;
+
+		if (validAccount(user, user.firstName, user.lastName))
+		{
+			userHistory->setFirstName(user.firstName);
+			userHistory->setLastName(user.lastName);
+	
 			buttonLogin->Visible = false;
 
 			labelDescription->Visible = false;
@@ -2541,11 +2466,13 @@ namespace Program2{
 			pictureBoxGif->Visible = false;
 
 			textBoxLogin->Visible = false;
+			labelAccountNumber->Visible = false;
 			textBoxPassword->Visible = false;
+			labelPassword->Visible = false;
 
 			timerCardAnimation->Enabled = false;
 
-			labelDescription->Text = "Thank you, " + username + ", for joining us today!";
+			labelDescription->Text = "Thank you, " + user.firstName + " " + user.lastName + ", for joining us today!";
 
 			labelDescription->Location = Point(504 - (labelDescription->Width / 2), 49);
 
@@ -2559,17 +2486,31 @@ namespace Program2{
 			buttonResults->BringToFront();
 			buttonResults->Visible = true;
 
-			if (firstName->ToLower() == "test")
+			buttonHistory->BringToFront();
+			buttonHistory->Visible = true;
+
+			if (user.firstName->ToLower() == "admin")
 			{
+				debugMode = true;
+				comboBoxCheat->Enabled = true;
+				comboBoxCheat->Visible = true;
 				buttonPlay->Visible = false;
 				buttonTest->Visible = true;
 				comboBoxTestFunctions->Visible = true;
+				comboBoxTestFunctions->BringToFront();
+			}
+
+			if (user.password == "master")
+			{
+				buttonDisplayDeck->Visible = true;
+				setupDeckBySuit(deck);
+				shuffleDeck(deck);
 			}
 		}
 
 		else
 		{
-			MessageBox::Show("Please enter a username to log in!", "Error");
+			MessageBox::Show("Please enter a valid four digit account number and password to log in!", "Error");
 		}
 }
 
@@ -2636,7 +2577,6 @@ namespace Program2{
 				//
 				////////////////////////////////////////////////////////////////////
 
-				int playerCardValue, dealerCardValue;
 
 				////////////////////////////////////////////////////////////////////
 
@@ -2669,89 +2609,56 @@ namespace Program2{
 
 				if (deck->Count < 4)
 				{
+					setupDeckBySuit(deck);
 					shuffleDeck(deck);
 				}
 
 				for (int i = 0; i < 2; i ++)
 				{
-					//playerHand[i] = dealCard(deck);
-					//dealerHand[i] = dealCard(deck);
-
-					//playerCardValue = getCardValue(cardsDealtToPlayer[i]);
-					//dealerCardValue = getCardValue(cardsDealtToDealer[i]);
-
-					//displayCardandValue(playerHand[i], i, playerCardPositions[i]);
-					//displayCardandValue(dealerHand[i], i, dealerCardPositions[i]);
-
-					/*if (cardAce(cardsDealtToDealer[i]))
-					{
-						dealerCardValue = dealerAceChange(dealerCardTotal);
-
-						if (dealerCardValue == 1)
-						{
-							dealerCardLabels[i]->Text = "Card Value: 1";
-						}
-						
-					}*/
-
-					playerCardsInHand++;
-					dealerCardsInHand++;
-
-					playerCardTotal += playerCardValue;
-					dealerCardTotal += dealerCardValue;
+					dealCard(deck, playerHand, "player");
+					dealCard(deck, dealerHand, "dealer");					
 				}
 
 				
-				displayCardTotal(true);
-				displayCardTotal(false);
+				displayCardTotal(playerHand, true);
+				displayCardTotal(dealerHand, false);
 
-				if (blackJack(playerCardTotal) && blackJack(dealerCardTotal))
+				if (blackJack(playerHand->getHandValue()) && blackJack(dealerHand->getHandValue()))
 				{
 					displayGameResults("bj tie");
 					tied = true;
-					cleanup(playerCardsInHand, dealerCardsInHand);
 					tie++;
+					cleanup();
+					
 					
 				}
 
-				else if (blackJack(playerCardTotal))
+				else if (blackJack(playerHand->getHandValue()))
 				{
 					displayGameResults("player bj");
 					playerWin = true;
 					playerBlackJack = true;
-					cleanup(playerCardsInHand, dealerCardsInHand);
 					win++;
+					cleanup();
+					
 					
 				}
 
-				else if (blackJack(dealerCardTotal))
+				else if (blackJack(dealerHand->getHandValue()))
 				{
 					displayGameResults("dealer bj");
-					cleanup(playerCardsInHand, dealerCardsInHand);
 					loss++;
+					cleanup();
+					
 				}
-				
-				for (int i = 0; i < playerCardsInHand; i++)
-				{
-					/*if (cardAce(cardsDealtToPlayer[i]))
-						{
-							if (changeValueAce(i) == 1)
-							{
-								playerCardTotal -= 10;
-								displayCardTotal(true);
+					
 
-								playerCardLabels[i]->Text = "Card Value: 1";
-								//displayCardandValue(cardsDealtToPlayer[i], i, 1, playerCardPositions[i], true);
-							}
-						}*/
-				}
-				
-
-				if (bust(playerCardTotal))
+				if (bust(playerHand->getHandValue()))
 				{
 					displayGameResults("player bust");
-					cleanup(playerCardsInHand, dealerCardsInHand);
 					loss++;
+					cleanup();
+					
 				}
 
 			}
@@ -2786,95 +2693,79 @@ namespace Program2{
 			//
 			////////////////////////////////////////////////////////////////////
 
-			int dealerCardValue;
 
 			////////////////////////////////////////////////////////////////////
 
-			while (dealerHit(dealerCardTotal) && dealerCardsInHand < 5)
+			while (dealerHit(dealerHand->getHandValue()) && dealerHand->getHandSize() < 5)
 			{
 				if (deck->Count == 0)
 				{
+					setupDeckBySuit(deck);
 					shuffleDeck(deck);
 				}
 				displayDealerStrategy();
 				labelDescription->Location = Point(504 - (labelDescription->Width / 2), 49);
 
-				//dealerHand[dealerCardsInHand] = dealCard(deck);
 
-				//dealerCardValue = getCardValue(cardsDealtToDealer[dealerCardsInHand]);
+				dealCard(deck, dealerHand, "dealer");
 
-				//displayCardandValue(dealerHand[dealerCardsInHand], dealerCardsInHand, dealerCardPositions[dealerCardsInHand]);
-
-				/*if (cardAce(cardsDealtToDealer[dealerCardsInHand]))
-				{
-					dealerCardValue = dealerAceChange(dealerCardTotal);
-
-					if (dealerCardValue == 1)
-					{
-						dealerCardLabels[dealerCardsInHand]->Text = "Card Value: 1";
-					}
-
-				}*/
-
-				dealerCardsInHand++;
-
-				dealerCardTotal += dealerCardValue;
-
-				displayCardTotal(false);
+				displayCardTotal(dealerHand, false);
 			}
 
-			if (dealerCardTotal < 22 && dealerCardsInHand != 5)
+			if (dealerHand->getHandValue() < 22 && dealerHand->getHandSize() != 5)
 			{
 				displayDealerStrategy();
 			}
 
-			if (bust(dealerCardTotal))
+			if (bust(dealerHand->getHandValue()))
 			{
 				displayGameResults("dealer bust");
 				playerWin = true;
-				cleanup(playerCardsInHand, dealerCardsInHand);
 				win++;
+				cleanup();
 				
-
 			}
 
-			else if (dealerCardsInHand == 5)
+			else if (dealerHand->getHandValue() == 5)
 			{
 				displayGameResults("dealer 5 card win");
-				cleanup(playerCardsInHand, dealerCardsInHand);
 				loss++;
+				cleanup();
+				
 			}
 
-			else if (dealerCardTotal > playerCardTotal)
+			else if (dealerHand->getHandValue() > playerHand->getHandValue())
 			{
 				displayGameResults("dealer win");
-				cleanup(playerCardsInHand, dealerCardsInHand);
 				loss++;
+				cleanup();
+				
 			}
 
-			else if (playerCardTotal > dealerCardTotal)
+			else if (playerHand->getHandValue() > dealerHand->getHandValue())
 			{
 				displayGameResults("player win");
 				playerWin = true;
-				cleanup(playerCardsInHand, dealerCardsInHand);
 				win++;
+				cleanup();
+				
 				
 			}
 
-			else if (playerCardTotal == dealerCardTotal)
+			else if (playerHand->getHandValue() == dealerHand->getHandValue())
 			{
 				displayGameResults("tie");
 				tied = true;
-
-				cleanup(playerCardsInHand, dealerCardsInHand);
 				tie++;
+				cleanup();
+				
 				
 			}
 
 			else
 			{
-				MessageBox::Show("Error! Dealer Total: " + dealerCardTotal.ToString() + " Player Total: " + playerCardTotal.ToString(), "Error!");
-				cleanup(playerCardsInHand, dealerCardsInHand);
+				MessageBox::Show("Error! Dealer Total: " + dealerHand->getHandValue().ToString() + " Player Total: " + playerHand->getHandValue().ToString(), "Error!");
+				cleanup();
 			}
 }
 
@@ -2893,25 +2784,24 @@ Store deck on disk
 Load deck from disk
 Return
 */
-			if (comboBoxTestFunctions->Text == "Set up deck")
+			if (comboBoxTestFunctions->Text == "Set up deck by suit")
 			{
 				setupDeckBySuit(deck);
+			}
+
+			if (comboBoxTestFunctions->Text == "Set up deck by value")
+			{
+				setupDeckByValue(deck);
 			}
 
 			if (comboBoxTestFunctions->Text == "Display deck")
 			{
 				displayDeck(deck);
-				for (int i = 0; i < 52; i++)
-				{
-					dealCard(deck, testerHand, "tester");
-				}
-
 			}
 
 			if (comboBoxTestFunctions->Text == "Shuffle deck")
 			{
 				shuffleDeck(deck);
-				
 			}
 
 			if (comboBoxTestFunctions->Text == "Shuffle deck (Random Swap)")
@@ -2921,13 +2811,7 @@ Return
 
 			if (comboBoxTestFunctions->Text == "Deal a card")
 			{
-				for (int i = 0; i < testerHand->getHandSize(); i++)
-				{
-					delete testerCardPictureBoxes[i];
-					delete testerCardLabels[i];
-				}
-
-				testerHand->clearHand();
+				clearScreenTester();
 
 				dealCard(deck, testerHand, "tester");
 
@@ -2935,45 +2819,37 @@ Return
 
 			if (comboBoxTestFunctions->Text == "Deal a hand")
 			{
-				for (int i = 0; i < testerHand->getHandSize(); i++)
-				{
-					delete testerCardPictureBoxes[i];
-					delete testerCardLabels[i];
-				}
-
-				dealCard(deck, testerHand, "tester");
-				dealCard(deck, testerHand, "tester");
+				clearScreenTester();
+				dealHand(deck, testerHand, "tester");
+				
 			}
 
 			if (comboBoxTestFunctions->Text == "Add card to hand")
 			{
-				dealCard(deck, testerHand, "tester");
+				addCardToHand(deck, testerHand, "tester");
 			}
 
 			if (comboBoxTestFunctions->Text == "Arrange hand")
 			{
-				shuffleDeck(deck);
+				arrangeHand(testerHand, "tester");
 			}
 
 			if (comboBoxTestFunctions->Text == "Store deck on disk")
 			{
-				shuffleDeck(deck);
+				storeDeck(deck);
 			}
 
 			if (comboBoxTestFunctions->Text == "Load deck from disk")
 			{
-				shuffleDeck(deck);
+				loadDeck(deck);
 			}
 
 			if (comboBoxTestFunctions->Text == "Return")
 			{
-				for (int i = 0; i < testerHand->getHandSize(); i++)
-				{
-					delete testerCardPictureBoxes[i];
-					delete testerCardLabels[i];
-				}
-
-				testerHand->clearHand();
+				clearScreenTester();
+				comboBoxTestFunctions->Visible = false;
+				buttonPlay->Visible = true;
+				deck->Clear();
 			}
 		}
 
@@ -3064,7 +2940,7 @@ private: System::Void testerCard_MouseEnter(System::Object^ sender, System::Even
 			pictureBoxCardAnimation1->Visible = true;
 			pictureBoxCardAnimation2->Visible = true;
 
-			//sndPlayer->PlayLooping();
+			sndPlayer->PlayLooping();
 		}
 
 		/**************************************************************
@@ -3117,12 +2993,120 @@ private: System::Void testerCard_MouseEnter(System::Object^ sender, System::Even
 			labelDateTime->Text = DateTime::Now.ToString();
 		}
 
-			////////////////////////////////////////////////////////////////////
-			//
-			//				END EVENT DRIVEN FUNCTIONS
-			//
-			///////////////////////////////////////////////////////////////////
+private: System::Void buttonDisplayDeck_Click(System::Object^  sender, System::EventArgs^  e) 
+{
+	static bool firstClick = true;
 
+	if (firstClick)
+	{
+		displayDeck(deck);
+		buttonDisplayDeck->Text = "Clear Screen";
+		firstClick = false;
+	}
 
+	else
+	{
+		clearScreenTester();
+		buttonDisplayDeck->Text = "Display Deck";
+		firstClick = true;
+	}
+	
+}
+private: System::Void buttonHistory_Click(System::Object^  sender, System::EventArgs^  e) 
+{
+	String^ message;
+	String^ firstName = userHistory->getFirstName();
+	String^ lastName = userHistory->getLastName();
+	ArrayList^ gameStats = gcnew ArrayList(userHistory->getGameStats());
+	ArrayList^ gameStatsLowHigh = gcnew ArrayList(userHistory->sortHandTotals());
+	ArrayList^ dealerGameStats = gcnew ArrayList(dealerHistory->getGameStats());
+	GameType tempGame;
+	GameType dealerTempGame;
+
+	int totalGames = userHistory->getTotalGames();
+	int handsLessThan16 = userHistory->calcTotalHandsBelow16();
+	int handsBetween16and21 = userHistory->calcTotalHandsBetween16and20();
+	int handsExactly21 = userHistory->calcTotalHandsExactly21();
+	int handsOver21 = userHistory->calcTotalHandsOver21();
+	int wins = userHistory->calcTotalWins();
+	int losses = userHistory->calcTotalLosses();
+	int ties = userHistory->calcTotalTies();
+	message = "In " + totalGames.ToString() + " games,\n\n" + firstName + " has won " + wins + " time(s)\n" +
+			  firstName + " has lost " + losses + " time(s)\n" + firstName + " has tied " + ties + " time(s)\n\n";
+
+	for (int i = 0; i < totalGames; i++)
+	{
+		tempGame = safe_cast<GameType>(gameStats[i]);
+		dealerTempGame = safe_cast<GameType>(dealerGameStats[i]);
+
+		if (tempGame.gameOutcome == GameResult::win)
+		{
+			 message += "Game #" + tempGame.gameNumber + " ends with " + firstName + " winning with " + tempGame.cardTotal + 
+					    " and the dealer losing with " + dealerTempGame.cardTotal + "!\n";
+		}
+
+		if (tempGame.gameOutcome == GameResult::lose)
+		{
+			message += "Game #" + tempGame.gameNumber + " ends with " + firstName + " losing with " + tempGame.cardTotal +
+					   " and the dealer winning with " + dealerTempGame.cardTotal + "!\n";
+		}
+
+		if (tempGame.gameOutcome == GameResult::tie)
+		{
+			message += "Game #" + tempGame.gameNumber + " ends with " + firstName + " and the dealer tying with " + tempGame.cardTotal + "!\n";
+		}
+		
+	}
+
+	message += "\nSo, in the " + totalGames + ", " + firstName + "'s card totals were:\n\t\t";
+
+	for (int i = 0; i < totalGames; i++)
+	{
+		tempGame = safe_cast<GameType>(gameStats[i]);
+		message += tempGame.cardTotal + " ";
+	}
+
+	message += "\nFrom lowest to highest, card totals were:\n\t\t";
+
+	for (int i = 0; i < totalGames; i++)
+	{
+		tempGame = safe_cast<GameType>(gameStatsLowHigh[i]);
+		message += tempGame.cardTotal + " ";
+	}
+	//MessageBox::Show(message, firstName + " " + lastName + "'s BlackJack History");
+	//message = "";
+
+	message += "\n\nWith the lowest total of " + safe_cast<GameType>(gameStatsLowHigh[0]).cardTotal + " and the highest total of " +
+		safe_cast<GameType>(gameStatsLowHigh[gameStatsLowHigh->Count - 1]).cardTotal + " with a total of " + handsOver21 + " bust(s), "
+		+ handsLessThan16 + " hands less than 16, " + handsBetween16and21 + " hands between 16 and 20, " + handsExactly21 + " hands exactly 21.\n\n";
+
+	message += "The games from lowest to highest were:\n";
+
+	for (int i = 0; i < totalGames; i++)
+	{
+		tempGame = safe_cast<GameType>(gameStatsLowHigh[i]);
+		message += "Game # " + tempGame.gameNumber + " (" + tempGame.cardTotal + ") ";
+	}
+
+	message += "\n\nSo " + firstName + " has won: ";
+
+	for (int i = 0; i < totalGames; i++)
+	{
+		tempGame = safe_cast<GameType>(gameStats[i]);
+		if (tempGame.gameOutcome == GameResult::win)
+		{
+			message += "Game # " + tempGame.gameNumber + " (with " + tempGame.cardTotal + ") ";
+		}
+		
+	}
+
+	MessageBox::Show(message, firstName + " " + lastName + "'s BlackJack History");
+}
+
+		 ////////////////////////////////////////////////////////////////////
+		 //
+		 //				END EVENT DRIVEN FUNCTIONS
+		 //
+		 ///////////////////////////////////////////////////////////////////
 };
 }

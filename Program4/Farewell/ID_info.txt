@@ -1,10 +1,10 @@
 Programmers		:Laithe Marshall
-Assignment #		:Program 2
-Assignment Name		:Black Jack
+Assignment #		:Final Project
+Assignment Name		:Black Jack - The Big Deal
 Course # and Title		:CISC 192 - C++
 Class Meeting Time		:MW 9:35 - 12:45
 Instructor			:Professor Forman
-Hours			:40
-Difficulty			:5
-Completion Date		:December/01/2014
-Project Name		:Program2
+Hours			:60
+Difficulty			:6
+Completion Date		:December/15/2014
+Project Name		:Program4

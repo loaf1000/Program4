@@ -25,45 +25,30 @@ public:
 
 	void arrangeHand()
 	{
-		ArrayList^ clubs;
-		ArrayList^ diamonds;
-		ArrayList^ hearts;
-		ArrayList^ spades;
-
-		Card^ tempCard;
-
-		//sort the hand by suit
-		for (int i = 0; i < _cards->Count; i++)
-		{
-			tempCard = safe_cast<Card^>(_cards[i]);
-
-			if (tempCard->getCardName() == "Clubs")
-			{
-				clubs->Add(tempCard);
-			}
-
-			else if (tempCard->getCardName() == "Diamonds")
-			{
-				diamonds->Add(tempCard);
-			}
-
-			else if (tempCard->getCardName() == "Hearts")
-			{
-				hearts->Add(tempCard);
-			}
-
-			else if (tempCard->getCardName() == "Spades")
-			{
-				spades->Add(tempCard);
-			}
-		}
+		bubbleSort(_cards);
+		
 	}
-		//sort the suits by value
 	void clearHand()
 	{
 		_handSize = 0;
 		_handValue = 0;
 		_cards->Clear();
+	}
+
+	void calcHandValue()
+	{
+		Card^ tempCard = gcnew Card();
+		_handValue = 0;
+		for (int i = 0; i < _cards->Count; i++)
+		{
+			tempCard =safe_cast<Card^> (_cards[i]);
+			_handValue += tempCard->getCardValue();
+		}
+	}
+
+	ArrayList^ getCards()
+	{
+		return _cards;
 	}
 
 	int getHandSize()
@@ -81,13 +66,23 @@ public:
 		_handValue = value;
 	}
 
+	void setHandSize(int value)
+	{
+		_handSize = value;
+	}
+
+	void setCards(ArrayList^ cards)
+	{
+		_cards = gcnew ArrayList(cards);
+		_handSize = cards->Count;
+	}
+
 	//Declare + define overloaded operator
 	void operator+= (Card^ card)
 	{
 		_cards->Add(card);
 		_handSize++;
 		_handValue += card->getCardValue();
-
 	}
 private:
 	ArrayList^ _cards;
@@ -97,52 +92,46 @@ private:
 	void bubbleSort(ArrayList^ cards)
 	{
 
-		Card^ tempCard;
-		Card^ rhCard;
-		Card^ lhCard;
+		Card^ tempCard = gcnew Card();
+		Card^ rhCard = gcnew Card();
+		Card^ lhCard = gcnew Card();
 		bool switched;
 		/*
-		do
+		do                                   from http://visualgo.net/
 
-		swapped = false
+			swapped = false
 
-		for i = 1 to numOfElements exclusive
+			for i = 1 to numOfElements exclusive
 
-		if leftElement > rightElement
+			if leftElement > rightElement
 
-		swap(leftElement, rightElement)
+				swap(leftElement, rightElement)
 
-		swapped = true
+				swapped = true
 
 		while swapped
 		*/
 		do
 		{
 			switched = false;
-
-			for (int i = 0; i < cards->Count; i++)
+			
+			for (int i = 1; i < cards->Count; i++)
 			{
-				lhCard =safe_cast<Card^>( cards[i]);
+				lhCard =safe_cast<Card^>( cards[i-1]);
 				
-				if (i + 1 < cards->Count)
-				{
-					rhCard = safe_cast<Card^>(cards[i + 1]);
-				}
+				rhCard = safe_cast<Card^>(cards[i]);
 
-				else
-				{
-					break;
-				}
+					if (lhCard->getCardImageList() > rhCard->getCardImageList())
+					{
+						tempCard = lhCard;
+						cards[i - 1] = cards[i];
+						cards[i] = tempCard;
 
-				if (lhCard->getCardValue() > rhCard->getCardValue())
-				{
-					tempCard = lhCard;
-					lhCard = rhCard;
-					rhCard = tempCard;
-
-					switched = true;
-				}
+						switched = true;
+					}
+					//MessageBox::Show(switched.ToString(), "True/False");
 			}
+				
 
 		} while (switched);
 

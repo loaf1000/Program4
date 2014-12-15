@@ -24,6 +24,9 @@
     <ClInclude Include="Hand.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="GameResult.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MyForm.cpp">

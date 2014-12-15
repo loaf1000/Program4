@@ -1,18 +1,33 @@
-1. Picture box animation on first screen
-2. Burpback full name once then use first name only
-3. Player must enter a name to continue
-4. Handle Screw ups
-5. Let player get as many extra cards as they want
-6. Let ace assume value of 11 or 1
-7. Do rest of task 7
-8. 5 card charlie
-9. After a card is dealt, it cannot be dealt again (until deck is reshuffled) (2 stars)
-10.User clicks quit before a game is over
-11.Total # of cards and total # of cards of value 10
-12.Total # of 10s, Jacks, Queens, Kings 
-13.Total # of cards of every Value
-14.Total # of hands <16, > 15 & < 21, 21, and >21
-15.Cheat mode for debugging purposes (2 stars)
-16.Limited Bankroll (2 stars)
+1. file IO for accounts
+2. full error checking handles non numeric input for account number
+3. include both deck by suit and deck by value
+4. Handle situations where user does not select setup deck button first
+5. in message box display order number of cards in deck
+6. display deck info in 13 picture boxes
+7. display 52 overlapping picture boxes (2 stars)
+8. add another shuffle deck button with different shuffle method
+9. Handle situations where user does not deal hand before add card to hand is pushed
+10.add store deck that stores all card info to file
+11.stored deck maintains order in which cards are suppose to be dealt next
+12.error checking to make sure storing deck does not fail
+13.read all card info when loading deck
+14.handle situation where user enters master password and does not setup the deck before playing black jack
+15.add "dealer is losing with" "dealer is winning with" to history
+16.add 3 times between 16 and 21, and 1 time under 16 to history
+17.add and the lowest game was Game #2  to history
+18.add and the lowest to highest games were Games #2 (12) #5 (16), #4 (18), #1 (21) #3 (23) (2 stars)
+19.So, in the 5 games, Albert Einstein's WINNING card totals were: 21 18 16
+20.Keep track which games the player won
+21.Combine the previous two STARS
+22.Use a custom-designed ref class with functions. (3 stars)
+23.Create and effectively use a vector/List. (3 stars)
+24.automatically change value of ace based on best choice for hand
+25.Effectively use enum
+26.Do not do this STAR and explain how you did not do it
+27.Effectiely used sophisticated features of GUIs comboboxes for cheat and test functions
+28.Instead of using Array::Sort, code your own version of the “bubble” sort
+29.Pizzazz: Cards, form, music, and background go together thematically,
+30.invent own idea: Cards are brought to focus when mouse hovers over them and reverts to original position on mouse leave
+31.Advanced feature: operator overloading, passing cli/c++ class by reference
 
-Total Stars: 19
+Total Stars: 37 (36 if star 30 does not count)

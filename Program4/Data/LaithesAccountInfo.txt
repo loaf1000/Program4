@@ -1,0 +1,6 @@
+1111, blackjack, Albert, Einstein
+2222, blackjack, Madame, Curie
+3333, blackjack, Laithe, Marshall
+4444, blackjack, Some, Person
+5555, blackjack, Another, Person
+6666, blackjack, Admin, Admin

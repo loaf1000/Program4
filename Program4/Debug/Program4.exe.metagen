@@ -17,10 +17,10 @@ Assembly System.Xml, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c5619
 Class Program2.MyForm: AutoLayout, AnsiClass, Class, Public, BeforeFieldInit
   :System.Windows.Forms.Form
     Void .ctor(): PrivateScope, Public, HideBySig, SpecialName, RTSpecialName
-Struct Program2.MyForm+CardsType: AutoLayout, AnsiClass, Class, NestedPublic, SequentialLayout, Sealed, BeforeFieldInit
+Struct Program2.MyForm+AccountType: AutoLayout, AnsiClass, Class, NestedPublic, SequentialLayout, Sealed, BeforeFieldInit
   :System.ValueType
   Fields:
-    System.String cardName : Public
-    System.String cardSuit : Public
-    Int32 cardValue : Public
-    Int32 cardImageList : Public
+    System.String accountNumber : Public
+    System.String password : Public
+    System.String firstName : Public
+    System.String lastName : Public
