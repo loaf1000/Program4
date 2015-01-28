@@ -97,7 +97,7 @@ will exit the program after giving the user a farewell message.
 CREDITS
 
 Acknowledge those who helped you and whom you helped
-Remember the ìtriangle of learningî
+Remember the ‚Äútriangle of learning‚Äù
 
 Thanks for assistance and inspiration from:
 
@@ -1303,7 +1303,7 @@ namespace Program2{
 					{
 						for (int i = 0; i < aceIndex; i++)
 						{
-							testerCardLabels[aceIndexHand[i]]->Text = "Ace of " + aceSuit[i] + "\n(1)";
+							dealerCardLabels[aceIndexHand[i]]->Text = "Ace of " + aceSuit[i] + "\n(1)";
 						}
 					}
 				}
